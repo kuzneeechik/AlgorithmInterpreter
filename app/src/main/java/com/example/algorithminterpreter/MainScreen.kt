@@ -8,7 +8,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -19,19 +21,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.algorithminterpreter.R
 import com.example.algorithminterpreter.TomorrowFont
+import com.example.algorithminterpreter.ui.theme.AlgorithmInterpreterTheme
 
 @Composable
-fun StartScr(
+fun StartScreen(
     onNewProject: () -> Unit,
     onMyProjects: () -> Unit,
     onAbout: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Box(modifier = modifier.fillMaxSize()) {
+    Box(modifier = modifier
+        .fillMaxSize()
+        .statusBarsPadding()
+        .navigationBarsPadding()
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -51,7 +59,7 @@ fun StartScr(
                 onClick = onNewProject,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 40.dp)
+                    .padding(horizontal = 50.dp)
                     .border(4.dp, Color.White, RoundedCornerShape(25.dp)),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF6D60F8),
@@ -70,14 +78,12 @@ fun StartScr(
         Image(
             painter = painterResource(id = R.drawable.deep_wave),
             contentDescription = "верхняя",
-            modifier = Modifier
-                .align(Alignment.TopStart)
+            modifier = Modifier.align(Alignment.TopStart)
         )
         Image(
             painter = painterResource(id = R.drawable.down_wave),
             contentDescription = "нижняя",
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
+            modifier = Modifier.align(Alignment.BottomEnd)
         )
     }
 }
