@@ -1,35 +1,46 @@
 package com.example.algorithminterpreter
 
-class Lexer(private val code: String) {
+class Lexer(private var code: String) {
     private var pos: Int = 0
-    private val tokens: MutableList<Token> = mutableListOf()
+    val tokens: MutableList<Token> = mutableListOf()
 
     fun lexAnalysis(): MutableList<Token>
     {
-        while (nextToken())
+        val codeLength: Int = code.length
+
+        while (nextToken(codeLength))
         {
-            println("work")
+            /* to do */
         }
 
         return tokens
     }
 
-    private fun nextToken(): Boolean
+    private fun nextToken(codeLength: Int): Boolean
     {
-        if (pos >= code.length) {
+        if (pos >= codeLength) {
             return false
         }
 
         for (i in 0 until tokenTypeList.size) {
             val currentType: TokenType = tokenTypeList[i]
-            val currentRegular = Regex('^' + currentType.regular)
+            val currentRegular = currentType.regular.toRegex()
+
+            val match = currentRegular.find(code)
             var result = ""
 
-            if (currentRegular.containsMatchIn(code)) {
-                result = code.substring(pos)
+            if (match != null)
+            {
+                val start = match.range.first
+                val end = match.range.last + 1
+
+                result = code.substring(start, end)
+
+                code = code.removeRange(start, end)
             }
 
-            if (result.isNotEmpty()) {
+            if (result.isNotEmpty())
+            {
                 val token = Token(currentType, result, pos)
                 tokens.add(token)
 
@@ -38,7 +49,6 @@ class Lexer(private val code: String) {
                 return true
             }
         }
-        println("На позиции $pos обнаружена ошибка")
-        return false
+        throw Error ("There is error on the position $pos")
     }
 }

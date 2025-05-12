@@ -1,4 +1,4 @@
-package com.example.algorithminterpreter.AST
+package com.example.algorithminterpreter.ast
 
 import com.example.algorithminterpreter.Token
 
