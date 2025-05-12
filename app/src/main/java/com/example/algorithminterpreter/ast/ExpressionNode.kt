@@ -1,0 +1,3 @@
+package com.example.algorithminterpreter.ast
+
+interface ExpressionNode
