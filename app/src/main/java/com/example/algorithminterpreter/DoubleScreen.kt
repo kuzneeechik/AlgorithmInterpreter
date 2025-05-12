@@ -67,7 +67,7 @@ fun ProjectScreen() {
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .navigationBarsPadding()
-                .height(60.dp)
+                .height(75.dp)
                 .fillMaxWidth()
                 .background(Color(0xFF5F52F0)),
             verticalAlignment = Alignment.CenterVertically,
