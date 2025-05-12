@@ -1,6 +1,8 @@
 
 package com.example.algorithminterpreter
 
+import ProjectScreen
+import StartScr
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -60,92 +62,3 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Composable
-fun StartScr(
-    onNewProject: () -> Unit,
-    onMyProjects: () -> Unit,
-    onAbout: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Box(modifier = modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color(0xFF6D60F8))
-                .padding(40.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.icon),
-                contentDescription = "Лого step code"
-            )
-
-            Spacer(modifier = Modifier.height(50.dp))
-
-            Button(
-                onClick = onNewProject,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 40.dp)
-                    .border(4.dp, Color.White, RoundedCornerShape(25.dp)),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF6D60F8),
-                    contentColor = Color.White
-                )
-            ) {
-                Text(
-                    text = "Start",
-                    fontFamily = TomorrowFont,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 36.sp
-                )
-            }
-        }
-
-        Image(
-            painter = painterResource(id = R.drawable.deep_wave),
-            contentDescription = "верхняя",
-            modifier = Modifier
-                .align(Alignment.TopStart)
-        )
-        Image(
-            painter = painterResource(id = R.drawable.down_wave),
-            contentDescription = "нижняя",
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-        )
-    }
-}
-
-@Composable
-fun ProjectScreen() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFE0DDFF))
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.big_line),
-            contentDescription = "Линия сверху консоли",
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.TopStart)
-        )
-        Image(
-            painter = painterResource(id = R.drawable.smal_line),
-            contentDescription = "Линия внизу консоли",
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.BottomStart)
-        )
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-
-        ) {
-
-        }
-    }
-}
