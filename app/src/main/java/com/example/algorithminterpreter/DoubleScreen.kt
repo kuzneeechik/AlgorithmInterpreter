@@ -1,45 +1,45 @@
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.*
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.algorithminterpreter.R
 import com.example.algorithminterpreter.TomorrowFont
 import com.example.algorithminterpreter.ui.theme.AlgorithmInterpreterTheme
-
+import androidx.compose.animation.core.animateDpAsState
 @Composable
 fun ProjectScreen() {
+    var blocksVisible by remember { mutableStateOf(false) }
+    var consoleVisible by remember { mutableStateOf(false) }
+    val checkConsoleBord by animateDpAsState(
+        targetValue = if (consoleVisible) (-298).dp else (0).dp
+    )
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFE0DDFF))
     ) {
-
+        Image(
+            painter = painterResource(id = R.drawable.block),
+            contentDescription = "Blocks",
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(top = 150.dp)
+                .width(35.dp)
+                .height(150.dp)
+                .clickable { if (!consoleVisible) blocksVisible = !blocksVisible  }
+        )
         Row(
             modifier = Modifier
                 .statusBarsPadding()
@@ -50,99 +50,131 @@ fun ProjectScreen() {
             horizontalArrangement = Arrangement.Start
         ) {}
 
-
-
-        Column(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            ///////////
-
-
-            /////
-        }
-
-
-
-        Row(
+        Box(
             modifier = Modifier
+                .offset(y=checkConsoleBord)
                 .align(Alignment.BottomCenter)
                 .navigationBarsPadding()
                 .height(75.dp)
                 .fillMaxWidth()
-                .background(Color(0xFF5F52F0)),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Button(
-                onClick = {},
+            Row(
                 modifier = Modifier
-                    .padding(start = 16.dp)
-                    .height(55.dp)
-                    .border(2.dp, Color.White, RoundedCornerShape(25.dp)),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF6D60F8),
-                    contentColor = Color.White
-                ),
-                contentPadding = PaddingValues(horizontal = 12.dp)  //внутренние отступы
+                    .fillMaxSize()
+                    .background(Color(0xFF5F52F0)),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)  //отступ между иконкой и текстом
+                Button(
+                    onClick = {},
+                    modifier = Modifier
+                        .padding(start = 16.dp)
+                        .height(55.dp)
+                        .border(2.dp, Color.White, RoundedCornerShape(25.dp)),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF6D60F8),
+                        contentColor = Color.White
+                    ),
+                    contentPadding = PaddingValues(horizontal = 12.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.PlayArrow,
-                        contentDescription = "Start",
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Text(
-                        text = "Start",
-                        fontFamily = TomorrowFont,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.PlayArrow,
+                            contentDescription = "Start",
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Text(
+                            text = "Start",
+                            fontFamily = TomorrowFont,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 20.sp
+                        )
+                    }
+                }
+                Text(
+                    text = "StepCode",
+                    color = Color.White,
+                    fontFamily = TomorrowFont,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 24.sp
+                )
+                Button(
+                    onClick = {},
+                    modifier = Modifier
+                        .padding(end = 16.dp)
+                        .height(55.dp)
+                        .border(2.dp, Color.White, RoundedCornerShape(25.dp)),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Transparent,
+                        contentColor = Color.White
+                    ),
+                    contentPadding = PaddingValues(horizontal = 12.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Clear,
+                            contentDescription = "Clear",
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Text(
+                            text = "Clear",
+                            fontFamily = TomorrowFont,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 20.sp
+                        )
+                    }
                 }
             }
-
-
-            Text(
-                text = "StepCode",
-                color = Color.White,
-                fontFamily = TomorrowFont,
-                fontWeight = FontWeight.Bold,
-                fontSize = 24.sp
+            Image(
+                painter = painterResource(id = R.drawable.console),
+                contentDescription = "Console",
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .offset(y = (-38).dp)
+                    .width(160.dp)
+                    .height(40.dp)
+                    .clickable { consoleVisible = !consoleVisible }
             )
-
-
-
-            Button(
-                onClick = {},
+        }
+        //затемнение основного экрана
+        if (blocksVisible) {
+            Box(
                 modifier = Modifier
-                    .padding(end = 16.dp)
-                    .height(55.dp)
-                    .border(2.dp, Color.White, RoundedCornerShape(25.dp)),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Transparent,
-                    contentColor = Color.White
-                ),
-                contentPadding = PaddingValues(horizontal = 12.dp)
+                    .fillMaxSize()
+                    .background(Color(0xAA868599))
+                    .clickable { blocksVisible = false }
+            )
+        }
+        // панель с блоками поверх затемнения
+        if (blocksVisible) {
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .width(330.dp)
+                    .statusBarsPadding()
+                    .navigationBarsPadding()
+                    .background(Color(0xFFE0DDFF))
+                    .align(Alignment.TopStart)
+                    .padding(start = 50.dp, end = 50.dp, top = 50.dp, bottom = 70.dp)
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)  //отступ между иконкой и текстом
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Clear,
-                        contentDescription = "Start",
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Text(
-                        text = "Clear",
-                        fontFamily = TomorrowFont,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp
-                    )
-                }
+                BlockPanel()
             }
+        }
+        if (consoleVisible) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .navigationBarsPadding()
+                    .height(298.dp)
+                    .align(Alignment.BottomCenter)
+                    .background(Color(0xFF8685C7))
+            )
         }
     }
 }
