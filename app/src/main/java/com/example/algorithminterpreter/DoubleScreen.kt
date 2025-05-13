@@ -77,8 +77,8 @@ fun ProjectScreen() {
                 onClick = {},
                 modifier = Modifier
                     .padding(start = 16.dp)
-                    .height(45.dp)
-                    .border(2.dp, Color.White, RoundedCornerShape(15.dp)),
+                    .height(55.dp)
+                    .border(2.dp, Color.White, RoundedCornerShape(25.dp)),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF6D60F8),
                     contentColor = Color.White
@@ -118,8 +118,8 @@ fun ProjectScreen() {
                 onClick = {},
                 modifier = Modifier
                     .padding(end = 16.dp)
-                    .height(36.dp)
-                    .border(2.dp, Color.White, RoundedCornerShape(15.dp)),
+                    .height(55.dp)
+                    .border(2.dp, Color.White, RoundedCornerShape(25.dp)),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.Transparent,
                     contentColor = Color.White
