@@ -8,6 +8,9 @@ val tokenTypeList: MutableList<TokenType> = mutableListOf(
     TokenType("ASSIGN", "^="),
     TokenType("PLUS", "^\\+"),
     TokenType("MINUS", "^-"),
+    TokenType ("DIV", "^\\/"),
+    TokenType("MULTI", "^\\*"),
+    TokenType("MOD", "^%"),
     TokenType("LEFT PAR", "^\\("),
     TokenType("RIGHT PAR", "^\\)"),
     TokenType("SPACE", "^[ \\n\\t\\r]"))
