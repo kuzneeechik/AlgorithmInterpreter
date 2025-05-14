@@ -7,6 +7,14 @@ class Parser(private val tokens: List<Token>)
     private var pos: Int = 0
     private var scope = mutableMapOf<String, Any>()
 
+    private fun skipSpaces()
+    {
+        while (pos < tokens.size && tokens[pos].type.name == "SPACE")
+        {
+            pos++
+        }
+    }
+
     private fun match(vararg expected: TokenType): Token?
     {
         if (pos < tokens.size)
@@ -65,19 +73,29 @@ class Parser(private val tokens: List<Token>)
 
     private fun parseFormula(): ExpressionNode
     {
+        skipSpaces()
         var leftNode = parseParentheses()
+        skipSpaces()
         var operator = match(
             tokenTypeList.find { it.name == "MINUS" }!!,
-            tokenTypeList.find { it.name == "PLUS" }!!)
+            tokenTypeList.find { it.name == "PLUS" }!!,
+            tokenTypeList.find { it.name == "MULTI"}!!,
+            tokenTypeList.find { it.name == "DIV" }!!,
+            tokenTypeList.find { it.name == "MOD" }!!)
 
         while (operator != null)
         {
+            skipSpaces()
             val rightNode = parseParentheses()
 
             leftNode = BinOperationNode(operator, leftNode, rightNode)
+            skipSpaces()
             operator = match(
                 tokenTypeList.find { it.name == "MINUS" }!!,
-                tokenTypeList.find { it.name == "PLUS" }!!)
+                tokenTypeList.find { it.name == "PLUS" }!!,
+                tokenTypeList.find { it.name == "MULTI" }!!,
+                tokenTypeList.find { it.name == "DIV" }!!,
+                tokenTypeList.find { it.name == "MOD" }!!)
         }
 
         return leftNode
@@ -93,6 +111,7 @@ class Parser(private val tokens: List<Token>)
         pos -= 1
 
         val variableNode = parseVariableOrNumber()
+        skipSpaces()
         val assignOperator = match(tokenTypeList.find { it.name == "ASSIGN" }!!)
 
         if (assignOperator != null)
@@ -104,22 +123,17 @@ class Parser(private val tokens: List<Token>)
         throw Error("The assign operator is expected on the position $pos")
     }
 
-    fun parseCode(): ExpressionNode
-    {
+    fun parseCode(): ExpressionNode {
         val root = StatementsNode()
 
         while (pos < tokens.size)
         {
-            val token = tokens[pos]
-
-            if (token.type.name == "SPACE")
-            {
-                pos++
-                continue
-            }
+            skipSpaces()
+            if (pos >= tokens.size) break
 
             val codeStringNode = parseExpression()
             root.addNode(codeStringNode)
+            skipSpaces()
         }
         return root
     }
@@ -135,6 +149,9 @@ class Parser(private val tokens: List<Token>)
                 {
                     "PLUS" -> return (run(node.leftNode) as Int + (run(node.rightNode) as Int))
                     "MINUS" -> return (run(node.leftNode) as Int - (run(node.rightNode) as Int))
+                    "MULTI" -> return (run(node.leftNode) as Int * (run(node.rightNode) as Int))
+                    "DIV" -> return (run(node.leftNode) as Int / (run(node.rightNode) as Int))
+                    "MOD" -> return (run(node.leftNode) as Int % (run(node.rightNode) as Int))
                     "ASSIGN" -> {
                         val result = run(node.rightNode)
                         val variableNode = node.leftNode as VariableNode
