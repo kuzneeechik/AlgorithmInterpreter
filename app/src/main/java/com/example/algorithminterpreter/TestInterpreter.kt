@@ -2,10 +2,10 @@ package com.example.algorithminterpreter
 
 fun main()
 {
-    val code = "x=3 y=3+9"
+    val code = "x = 145 / 5 y = x * 3 console.write x + y"
 
     val lexer = Lexer(code)
-    val tokens = lexer.lexAnalysis()
+    lexer.lexAnalysis()
 
     val parser = Parser(lexer.tokens)
     val rootNode = parser.parseCode()

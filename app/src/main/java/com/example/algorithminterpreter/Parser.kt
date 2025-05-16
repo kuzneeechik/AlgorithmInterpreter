@@ -101,11 +101,26 @@ class Parser(private val tokens: List<Token>)
         return leftNode
     }
 
+    private fun parsePrint(): ExpressionNode
+    {
+        skipSpaces()
+        val tokenPrint = match(tokenTypeList.find {it.name == "WRITE"}!!)
+        skipSpaces()
+
+        if (tokenPrint != null)
+        {
+            return UnarOperationNode(tokenPrint, parseFormula())
+        }
+
+        throw Error("The console.write operator is expected on the position $pos")
+    }
+
     private fun parseExpression(): ExpressionNode
     {
         if (match(tokenTypeList.find { it.name == "VARIABLE" }!!) == null)
         {
-            throw Error("Variable is expected on the position $pos")
+            val printNode = parsePrint()
+            return printNode
         }
 
         pos -= 1
@@ -142,22 +157,29 @@ class Parser(private val tokens: List<Token>)
     {
         when (node)
         {
-            is NumberNode -> return node.number.text.toInt()
+            is NumberNode -> return node.number.text.toLong()
 
             is BinOperationNode -> {
                 when (node.operator.type.name)
                 {
-                    "PLUS" -> return (run(node.leftNode) as Int + (run(node.rightNode) as Int))
-                    "MINUS" -> return (run(node.leftNode) as Int - (run(node.rightNode) as Int))
-                    "MULTI" -> return (run(node.leftNode) as Int * (run(node.rightNode) as Int))
-                    "DIV" -> return (run(node.leftNode) as Int / (run(node.rightNode) as Int))
-                    "MOD" -> return (run(node.leftNode) as Int % (run(node.rightNode) as Int))
+                    "PLUS" -> return (run(node.leftNode) as Long + (run(node.rightNode) as Long))
+                    "MINUS" -> return (run(node.leftNode) as Long - (run(node.rightNode) as Long))
+                    "MULTI" -> return (run(node.leftNode) as Long * (run(node.rightNode) as Long))
+                    "DIV" -> return (run(node.leftNode) as Long / (run(node.rightNode) as Long))
+                    "MOD" -> return (run(node.leftNode) as Long % (run(node.rightNode) as Long))
                     "ASSIGN" -> {
                         val result = run(node.rightNode)
                         val variableNode = node.leftNode as VariableNode
                         scope[variableNode.variable.text] = result!!
                         return result
                     }
+                }
+            }
+
+            is UnarOperationNode -> {
+                when (node.operator.type.name)
+                {
+                    "WRITE" -> println(run(node.operand))
                 }
             }
 
