@@ -1,6 +1,6 @@
 package com.example.algorithminterpreter
-
 import com.example.algorithminterpreter.ast.*
+import java.lang.Exception
 
 class Parser(private val tokens: List<Token>)
 {
@@ -32,7 +32,7 @@ class Parser(private val tokens: List<Token>)
 
     private fun require(vararg expected: TokenType): Token
     {
-        val token = match(*expected) ?: throw Error("on the position $pos expected ${expected[0].name}")
+        val token = match(*expected) ?: throw Error("${expected[0].name} is expected in the position $pos")
 
         return token
     }
@@ -53,7 +53,7 @@ class Parser(private val tokens: List<Token>)
             return VariableNode(variable)
         }
 
-        throw Error("Variable or number is expected on the position $pos")
+        throw Error("Variable or number is expected in the position $pos")
     }
 
     private fun parseParentheses(): ExpressionNode
@@ -141,7 +141,21 @@ class Parser(private val tokens: List<Token>)
             return UnarOperationNode(tokenPrint, parseFormula())
         }
 
-        throw Error("The 'console.write' operator is expected on the position $pos")
+        throw Error("The 'console.write' operator is expected in the position $pos")
+    }
+
+    private fun parseRead(): ExpressionNode
+    {
+        skipSpaces()
+        val tokenRead = match(tokenTypeList.find {it.name == "READ"}!!)
+        skipSpaces()
+
+        if (tokenRead != null)
+        {
+            return UnarOperationNode(tokenRead, parseVariableOrNumber())
+        }
+
+        throw Error("The 'console.read' operator is expected in the position $pos")
     }
 
     private fun parseInitialization(): ExpressionNode
@@ -155,7 +169,7 @@ class Parser(private val tokens: List<Token>)
             return UnarOperationNode(tokenInit, parseVariableOrNumber())
         }
 
-        throw Error("The 'int' operator is expected on the position $pos")
+        throw Error("The 'int' operator is expected in the position $pos")
     }
 
     private fun parseExpression(): ExpressionNode
@@ -168,6 +182,14 @@ class Parser(private val tokens: List<Token>)
 
                 val printNode = parsePrint()
                 return printNode
+            }
+
+            else if (match(tokenTypeList.find { it.name == "READ" }!!) != null)
+            {
+                pos -= 1
+
+                val readNode = parseRead()
+                return readNode
             }
 
             else if (match(tokenTypeList.find { it.name == "INIT" }!!) != null)
@@ -191,7 +213,7 @@ class Parser(private val tokens: List<Token>)
             return BinOperationNode(assignOperator, variableNode, rightFormulaNode)
         }
 
-        throw Error("The assign operator is expected on the position $pos")
+        throw Error("The assign operator is expected in the position $pos")
     }
 
     fun parseCode(): ExpressionNode {
@@ -239,16 +261,29 @@ class Parser(private val tokens: List<Token>)
                         print(run(node.operand))
                         print(' ')
                     }
+                    "READ" -> {
+                        val value = readln().toLongOrNull() ?: throw Error("Incorrect input")
+
+                        val variableNode = node.operand as VariableNode
+
+                        if (scope[variableNode.variable.text] == null)
+                        {
+                            println("The variable with name ${variableNode.variable.text} not found")
+                        }
+                        else
+                        {
+                            scope[variableNode.variable.text] = value
+                        }
+                    }
                     "INIT" -> {
                         val variableNode = node.operand as VariableNode
                         scope[variableNode.variable.text] = 0
-                        run(node.operand)
                     }
                 }
             }
 
             is VariableNode -> {
-                return scope[node.variable.text] ?: println("The variable with name ${node.variable.text} not found")
+                return scope[node.variable.text] ?: "The variable with name ${node.variable.text} not found"
             }
 
             is StatementsNode -> {

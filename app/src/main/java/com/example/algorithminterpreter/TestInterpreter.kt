@@ -2,7 +2,7 @@ package com.example.algorithminterpreter
 
 fun main()
 {
-    val code = "int x x = 2 + 3 * 4 console.write x"
+    val code = "int x console.read x console.write x + 45 * 2"
 
     val lexer = Lexer(code)
     lexer.lexAnalysis()
