@@ -157,6 +157,11 @@ class Parser(private val tokens: List<Token>)
     {
         if (match(tokenTypeList.find { it.name == "VARIABLE" }!!) == null)
         {
+            if (match(tokenTypeList.find { it.name == "IF" }!!) != null)
+            {
+                pos -= 1
+                return parseIf()
+            }
             if (match(tokenTypeList.find { it.name == "WRITE" }!!) != null)
             {
                 pos -= 1
@@ -189,7 +194,67 @@ class Parser(private val tokens: List<Token>)
         throw Error("The assign operator is expected on the position $pos")
     }
 
-    fun parseCode(): ExpressionNode {
+    private fun parseIf(): ExpressionNode
+    {
+        skipSpaces()
+        require(tokenTypeList.find { it.name == "IF" }!!)
+        skipSpaces()
+
+        val condition = parseComparison()
+        skipSpaces()
+
+        val trueBranch = StatementsNode()
+        val falseBranch = StatementsNode()
+
+        while (true)
+        {
+            skipSpaces()
+            if (match(tokenTypeList.find { it.name == "ELSE" }!!) != null) break
+            if (match(tokenTypeList.find { it.name == "ENDIF" }!!) != null)
+            {
+                return IfNode(condition, trueBranch, null)
+            }
+            trueBranch.addNode(parseExpression())
+        }
+
+        while (true)
+        {
+            skipSpaces()
+            if (match(tokenTypeList.find { it.name == "ENDIF" }!!) != null) break
+            falseBranch.addNode(parseExpression())
+        }
+
+        return IfNode(condition, trueBranch, falseBranch)
+    }
+
+    private fun parseComparison(): ExpressionNode
+    {
+        val leftNode = parseFormula()
+        skipSpaces()
+
+        val operator = match(
+            tokenTypeList.find { it.name == "EQUALITY" }!!,
+            tokenTypeList.find { it.name == "UNEQUAL" }!!,
+            tokenTypeList.find { it.name == "LESS" }!!,
+            tokenTypeList.find { it.name == "MORE" }!!,
+            tokenTypeList.find { it.name == "UM" }!!,
+            tokenTypeList.find { it.name == "UL" }!!
+        )
+
+        return if (operator != null)
+        {
+            skipSpaces()
+            val rightNode = parseFormula()
+            BinOperationNode(operator, leftNode, rightNode)
+        }
+        else
+        {
+            leftNode
+        }
+    }
+
+    fun parseCode(): ExpressionNode
+    {
         val root = StatementsNode()
 
         while (pos < tokens.size)
@@ -218,6 +283,12 @@ class Parser(private val tokens: List<Token>)
                     "MULTI" -> return (run(node.leftNode) as Long * (run(node.rightNode) as Long))
                     "DIV" -> return (run(node.leftNode) as Long / (run(node.rightNode) as Long))
                     "MOD" -> return (run(node.leftNode) as Long % (run(node.rightNode) as Long))
+                    "EQUALITY" -> return run(node.leftNode) == run(node.rightNode)
+                    "UNEQUAL" -> return run(node.leftNode) != run(node.rightNode)
+                    "LESS" -> return (run(node.leftNode) as Long) < (run(node.rightNode) as Long)
+                    "UL" -> return (run(node.leftNode) as Long) <= (run(node.rightNode) as Long)
+                    "MORE" -> return (run(node.leftNode) as Long) > (run(node.rightNode) as Long)
+                    "UM" -> return (run(node.leftNode) as Long) >= (run(node.rightNode) as Long)
                     "ASSIGN" -> {
                         val result = run(node.rightNode)
                         val variableNode = node.leftNode as VariableNode
@@ -248,6 +319,18 @@ class Parser(private val tokens: List<Token>)
 
             is StatementsNode -> {
                 node.codeStrings.forEach { run(it) }
+            }
+
+            is IfNode -> {
+                val result = run(node.condition)
+                if (result is Boolean && result)
+                {
+                    run(node.trueBranch)
+                }
+                else
+                {
+                    node.falseBranch?.let { run(it) }
+                }
             }
 
             else -> println("Error!")
