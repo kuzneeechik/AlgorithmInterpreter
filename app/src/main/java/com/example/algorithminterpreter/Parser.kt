@@ -112,15 +112,42 @@ class Parser(private val tokens: List<Token>)
             return UnarOperationNode(tokenPrint, parseFormula())
         }
 
-        throw Error("The console.write operator is expected on the position $pos")
+        throw Error("The 'console.write' operator is expected on the position $pos")
+    }
+
+    private fun parseInitialization(): ExpressionNode
+    {
+        skipSpaces()
+        val tokenInit = match(tokenTypeList.find {it.name == "INIT"}!!)
+        skipSpaces()
+
+        if (tokenInit != null)
+        {
+            return UnarOperationNode(tokenInit, parseVariableOrNumber())
+        }
+
+        throw Error("The 'int' operator is expected on the position $pos")
     }
 
     private fun parseExpression(): ExpressionNode
     {
         if (match(tokenTypeList.find { it.name == "VARIABLE" }!!) == null)
         {
-            val printNode = parsePrint()
-            return printNode
+            if (match(tokenTypeList.find { it.name == "WRITE" }!!) != null)
+            {
+                pos -= 1
+
+                val printNode = parsePrint()
+                return printNode
+            }
+
+            else if (match(tokenTypeList.find { it.name == "INIT" }!!) != null)
+            {
+                pos -= 1
+
+                val initNode = parseInitialization()
+                return initNode
+            }
         }
 
         pos -= 1
@@ -179,7 +206,15 @@ class Parser(private val tokens: List<Token>)
             is UnarOperationNode -> {
                 when (node.operator.type.name)
                 {
-                    "WRITE" -> println(run(node.operand))
+                    "WRITE" -> {
+                        print(run(node.operand))
+                        print(' ')
+                    }
+                    "INIT" -> {
+                        val variableNode = node.operand as VariableNode
+                        scope[variableNode.variable.text] = 0
+                        run(node.operand)
+                    }
                 }
             }
 
