@@ -73,8 +73,9 @@ class Parser(private val tokens: List<Token>)
         }
     }
 
-    private fun parseTerm(): ExpressionNode
+    private fun parsePriorities(): ExpressionNode
     {
+        skipSpaces()
         var leftNode = parseParentheses()
         skipSpaces()
 
@@ -91,7 +92,7 @@ class Parser(private val tokens: List<Token>)
 
             leftNode = BinOperationNode(operator, leftNode, rightNode)
             skipSpaces()
-
+            
             operator = match(
                 tokenTypeList.find { it.name == "MULTI" }!!,
                 tokenTypeList.find { it.name == "DIV" }!!,
@@ -104,7 +105,7 @@ class Parser(private val tokens: List<Token>)
 
     private fun parseFormula(): ExpressionNode
     {
-        var leftNode = parseTerm()
+        var leftNode = parsePriorities()
         skipSpaces()
 
         var operator = match(
@@ -115,7 +116,7 @@ class Parser(private val tokens: List<Token>)
         while (operator != null)
         {
             skipSpaces()
-            val rightNode = parseTerm()
+            val rightNode = parsePriorities()
 
             leftNode = BinOperationNode(operator, leftNode, rightNode)
             skipSpaces()
