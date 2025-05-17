@@ -58,6 +58,8 @@ class Parser(private val tokens: List<Token>)
 
     private fun parseParentheses(): ExpressionNode
     {
+        skipSpaces()
+        
         if (match(tokenTypeList.find { it.name == "LEFT PAR" }!!) != null)
         {
             val node = parseFormula()
@@ -71,17 +73,16 @@ class Parser(private val tokens: List<Token>)
         }
     }
 
-    private fun parseFormula(): ExpressionNode
+    private fun parseTerm(): ExpressionNode
     {
-        skipSpaces()
         var leftNode = parseParentheses()
         skipSpaces()
+
         var operator = match(
-            tokenTypeList.find { it.name == "MINUS" }!!,
-            tokenTypeList.find { it.name == "PLUS" }!!,
-            tokenTypeList.find { it.name == "MULTI"}!!,
+            tokenTypeList.find { it.name == "MULTI" }!!,
             tokenTypeList.find { it.name == "DIV" }!!,
-            tokenTypeList.find { it.name == "MOD" }!!)
+            tokenTypeList.find { it.name == "MOD" }!!
+        )
 
         while (operator != null)
         {
@@ -90,12 +91,39 @@ class Parser(private val tokens: List<Token>)
 
             leftNode = BinOperationNode(operator, leftNode, rightNode)
             skipSpaces()
+
             operator = match(
-                tokenTypeList.find { it.name == "MINUS" }!!,
-                tokenTypeList.find { it.name == "PLUS" }!!,
                 tokenTypeList.find { it.name == "MULTI" }!!,
                 tokenTypeList.find { it.name == "DIV" }!!,
-                tokenTypeList.find { it.name == "MOD" }!!)
+                tokenTypeList.find { it.name == "MOD" }!!
+            )
+        }
+
+        return leftNode
+    }
+
+    private fun parseFormula(): ExpressionNode
+    {
+        var leftNode = parseTerm()
+        skipSpaces()
+
+        var operator = match(
+            tokenTypeList.find { it.name == "PLUS" }!!,
+            tokenTypeList.find { it.name == "MINUS" }!!
+        )
+
+        while (operator != null)
+        {
+            skipSpaces()
+            val rightNode = parseTerm()
+
+            leftNode = BinOperationNode(operator, leftNode, rightNode)
+            skipSpaces()
+
+            operator = match(
+                tokenTypeList.find { it.name == "PLUS" }!!,
+                tokenTypeList.find { it.name == "MINUS" }!!
+            )
         }
 
         return leftNode
