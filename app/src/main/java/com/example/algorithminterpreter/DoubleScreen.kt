@@ -1,4 +1,7 @@
+package com.example.algorithminterpreter
 
+import Block
+import BlockPanel
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -18,6 +21,16 @@ import com.example.algorithminterpreter.R
 import com.example.algorithminterpreter.TomorrowFont
 import com.example.algorithminterpreter.ui.theme.AlgorithmInterpreterTheme
 import androidx.compose.animation.core.animateDpAsState
+import com.example.algorithminterpreter.FreeWorkspaceBlocksArea
+import com.example.algorithminterpreter.PositionedBlock
+import androidx.compose.ui.geometry.Offset
+import kotlin.math.roundToInt
+
+data class PositionedBlock(
+    val block: Block,
+    var position: Offset
+)
+
 @Composable
 fun ProjectScreen() {
     var blocksVisible by remember { mutableStateOf(false) }
@@ -25,11 +38,25 @@ fun ProjectScreen() {
     val checkConsoleBord by animateDpAsState(
         targetValue = if (consoleVisible) (-298).dp else (0).dp
     )
+    var workspaceBlocks by remember { mutableStateOf(listOf<PositionedBlock>()) }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFE0DDFF))
     ) {
+        FreeWorkspaceBlocksArea(
+            blocks = workspaceBlocks,
+            selectedBlock = null,
+            onWorkspaceClick = {},
+            onBlockMove = { index, offset ->
+                val mutable = workspaceBlocks.toMutableList()
+                val old = mutable[index]
+                mutable[index] = old.copy(position = old.position + offset)
+                workspaceBlocks = mutable
+            }
+        )
+
         Image(
             painter = painterResource(id = R.drawable.block),
             contentDescription = "Blocks",
@@ -38,7 +65,7 @@ fun ProjectScreen() {
                 .padding(top = 150.dp)
                 .width(35.dp)
                 .height(150.dp)
-                .clickable { if (!consoleVisible) blocksVisible = !blocksVisible  }
+                .clickable { if (!consoleVisible) blocksVisible = !blocksVisible }
         )
         Row(
             modifier = Modifier
@@ -52,7 +79,7 @@ fun ProjectScreen() {
 
         Box(
             modifier = Modifier
-                .offset(y=checkConsoleBord)
+                .offset(y = checkConsoleBord)
                 .align(Alignment.BottomCenter)
                 .navigationBarsPadding()
                 .height(75.dp)
@@ -142,7 +169,7 @@ fun ProjectScreen() {
                     .clickable { consoleVisible = !consoleVisible }
             )
         }
-        //затемнение основного экрана
+
         if (blocksVisible) {
             Box(
                 modifier = Modifier
@@ -150,34 +177,28 @@ fun ProjectScreen() {
                     .background(Color(0xAA868599))
                     .clickable { blocksVisible = false }
             )
-        }
-        // панель с блоками поверх затемнения
-        if (blocksVisible) {
             Box(
                 modifier = Modifier
+                    .width(300.dp)
                     .fillMaxHeight()
-                    .width(330.dp)
-                    .statusBarsPadding()
-                    .navigationBarsPadding()
-                    .background(Color(0xFFE0DDFF))
-                    .align(Alignment.TopStart)
-                    .padding(start = 50.dp, end = 50.dp, top = 50.dp, bottom = 70.dp)
+                    .background(Color.White)
+                    .align(Alignment.CenterStart)
+
             ) {
-                BlockPanel()
+                BlockPanel { block ->
+                    val baseX = 400f
+                    val baseY = 200f
+                    val blockHeight = 80f
+                    val newY = baseY + workspaceBlocks.size * blockHeight
+                    val offset = Offset(baseX, newY)
+                    workspaceBlocks = workspaceBlocks + PositionedBlock(block, offset)
+                    blocksVisible = false
+                }
             }
-        }
-        if (consoleVisible) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .navigationBarsPadding()
-                    .height(298.dp)
-                    .align(Alignment.BottomCenter)
-                    .background(Color(0xFF8685C7))
-            )
         }
     }
 }
+
 @Preview
 @Composable
 fun GreetingPreview() {

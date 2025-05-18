@@ -1,0 +1,81 @@
+package com.example.algorithminterpreter
+
+import Block
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Text
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.dp
+import kotlin.math.roundToInt
+
+@Composable
+fun FreeWorkspaceBlocksArea(
+    blocks: List<PositionedBlock>,
+    onWorkspaceClick: (Offset) -> Unit,
+    onBlockMove: (Int, Offset) -> Unit,
+    selectedBlock: Block?
+) {
+    var draggingIndex by remember { mutableStateOf<Int?>(null) }
+    var dragOffset by remember { mutableStateOf(Offset.Zero) }
+
+    Box(
+        Modifier
+            .fillMaxSize()
+            .background(Color(0xFFD6EAF8), RoundedCornerShape(12.dp))
+            .pointerInput(selectedBlock) {
+                detectTapGestures { offset ->
+                    if (selectedBlock != null) {
+                        onWorkspaceClick(offset)
+                    }
+                }
+            }
+    ) {
+        blocks.forEachIndexed { index, positionedBlock ->
+            val isDragging = draggingIndex == index
+            Box(
+                modifier = Modifier
+                    .offset {
+                        val pos = if (isDragging) positionedBlock.position + dragOffset else positionedBlock.position
+                        IntOffset(pos.x.roundToInt(), pos.y.roundToInt())
+                    }
+                    .pointerInput(index) {
+                        detectDragGestures(
+                            onDragStart = {
+                                draggingIndex = index
+                                dragOffset = Offset.Zero
+                            },
+                            onDrag = { _, dragAmount ->
+                                dragOffset += dragAmount
+                            },
+                            onDragEnd = {
+                                if (draggingIndex != null) {
+                                    onBlockMove(draggingIndex!!, dragOffset)
+                                }
+                                draggingIndex = null
+                                dragOffset = Offset.Zero
+                            }
+                        )
+                    }
+            ) {
+                Text(
+                    text = positionedBlock.block.text,
+                    color = Color.White,
+                    modifier = Modifier
+                        .background(positionedBlock.block.color, RoundedCornerShape(8.dp))
+                        .padding(16.dp)
+                )
+            }
+        }
+    }
+} 
