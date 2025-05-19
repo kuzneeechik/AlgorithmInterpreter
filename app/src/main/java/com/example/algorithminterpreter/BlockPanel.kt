@@ -5,11 +5,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.algorithminterpreter.BlockView
 
 
 data class Block(val id: Int, val text: String, val color: Color)
@@ -36,7 +38,8 @@ fun BlockPanel(onBlockClick: (Block) -> Unit) {
         Block(17, "if ... else", Color(0xFFFFAD19)),
         Block(18, "while", Color(0xFFFF5755)),
         Block(19, "console.read()", Color(0xFF9A66FF)),
-        Block(20, "console.write()", Color(0xFF9A66FF))
+        Block(20, "console.write()", Color(0xFF9A66FF)),
+        Block(21, "input()", Color(0xFF9A66FF))
     )
     Column(
         modifier = Modifier
@@ -44,22 +47,19 @@ fun BlockPanel(onBlockClick: (Block) -> Unit) {
             .navigationBarsPadding()
             .statusBarsPadding()
             .verticalScroll(rememberScrollState())
-            .padding(8.dp)
+            .padding(8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         blocks.forEach { block ->
             Box(
                 modifier = Modifier
-                    .fillMaxWidth()
                     .padding(vertical = 4.dp)
                     .background(block.color, RoundedCornerShape(8.dp))
                     .clickable { onBlockClick(block.copy(id = System.currentTimeMillis().toInt())) }
-                    .padding(vertical = 8.dp, horizontal = 12.dp)
             ) {
-                androidx.compose.material3.Text(
-                    text = block.text,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 22.sp
+                BlockView(
+                    block = block,
+                    onInputChange = {},
                 )
             }
         }

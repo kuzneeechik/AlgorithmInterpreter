@@ -24,11 +24,10 @@ import androidx.compose.animation.core.animateDpAsState
 import com.example.algorithminterpreter.FreeWorkspaceBlocksArea
 import com.example.algorithminterpreter.PositionedBlock
 import androidx.compose.ui.geometry.Offset
-import kotlin.math.roundToInt
-
 data class PositionedBlock(
     val block: Block,
-    var position: Offset
+    var position: Offset,
+    var inputValue: String = ""
 )
 
 @Composable
@@ -38,7 +37,15 @@ fun ProjectScreen() {
     val checkConsoleBord by animateDpAsState(
         targetValue = if (consoleVisible) (-298).dp else (0).dp
     )
-    var workspaceBlocks by remember { mutableStateOf(listOf<PositionedBlock>()) }
+    var workspaceBlocks = remember { mutableStateListOf<PositionedBlock>()}
+
+    val check by animateDpAsState(
+        targetValue = if (blocksVisible) 0.dp else (-300).dp
+    )
+    val checkButton by animateDpAsState(
+        targetValue = if (blocksVisible) 300.dp else 0.dp
+    )
+
 
     Box(
         modifier = Modifier
@@ -50,10 +57,8 @@ fun ProjectScreen() {
             selectedBlock = null,
             onWorkspaceClick = {},
             onBlockMove = { index, offset ->
-                val mutable = workspaceBlocks.toMutableList()
-                val old = mutable[index]
-                mutable[index] = old.copy(position = old.position + offset)
-                workspaceBlocks = mutable
+                val old = workspaceBlocks[index]
+                workspaceBlocks[index] = old.copy(position = old.position + offset)
             }
         )
 
@@ -129,7 +134,7 @@ fun ProjectScreen() {
                     fontSize = 24.sp
                 )
                 Button(
-                    onClick = {},
+                    onClick = {workspaceBlocks.clear()},
                     modifier = Modifier
                         .padding(end = 16.dp)
                         .height(55.dp)
@@ -177,24 +182,33 @@ fun ProjectScreen() {
                     .background(Color(0xAA868599))
                     .clickable { blocksVisible = false }
             )
-            Box(
-                modifier = Modifier
-                    .width(300.dp)
-                    .fillMaxHeight()
-                    .background(Color.White)
-                    .align(Alignment.CenterStart)
-
-            ) {
-                BlockPanel { block ->
-                    val baseX = 400f
-                    val baseY = 200f
-                    val blockHeight = 80f
-                    val newY = baseY + workspaceBlocks.size * blockHeight
-                    val offset = Offset(baseX, newY)
-                    workspaceBlocks = workspaceBlocks + PositionedBlock(block, offset)
-                    blocksVisible = false
-                }
+        }
+        Box(
+            modifier = Modifier
+                .offset(x = check)
+                .width(300.dp)
+                .fillMaxHeight()
+                .background(Color(0xFFE0DDFF)),
+        ) {
+            BlockPanel { block ->
+                val baseX = 400f
+                val baseY = 200f
+                val blockHeight = 80f
+                val newY = baseY + workspaceBlocks.size * blockHeight
+                val offset = Offset(baseX, newY)
+                workspaceBlocks.add(PositionedBlock(block, offset, ""))
+                blocksVisible = false
             }
+            Image(
+                painter = painterResource(id = R.drawable.block),
+                contentDescription = "Blocks",
+                modifier = Modifier
+                    .offset(x = checkButton)
+                    .padding(top = 150.dp)
+                    .width(35.dp)
+                    .height(150.dp)
+                    .clickable { if (!consoleVisible) blocksVisible = !blocksVisible }
+            )
         }
     }
 }
