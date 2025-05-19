@@ -19,6 +19,8 @@ data class Block(val id: Int, val text: String, val color: Color)
 @Composable
 fun BlockPanel(onBlockClick: (Block) -> Unit) {
     val blocks = listOf(
+        Block(22, "x", Color(0xFF35C1FE)),
+        Block(23, "0", Color(0xFF057CDE)),
         Block(1, "+", Color(0xFF2F860D)),
         Block(2, "%", Color(0xFF2F860D)),
         Block(3, "*", Color(0xFF2F860D)),
@@ -39,7 +41,8 @@ fun BlockPanel(onBlockClick: (Block) -> Unit) {
         Block(18, "while", Color(0xFFFF5755)),
         Block(19, "console.read()", Color(0xFF9A66FF)),
         Block(20, "console.write()", Color(0xFF9A66FF)),
-        Block(21, "input()", Color(0xFF9A66FF))
+        Block(21, "input()", Color(0xFF9A66FF)) ,
+
     )
     Column(
         modifier = Modifier
