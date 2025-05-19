@@ -17,12 +17,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.algorithminterpreter.R
-import com.example.algorithminterpreter.TomorrowFont
 import com.example.algorithminterpreter.ui.theme.AlgorithmInterpreterTheme
 import androidx.compose.animation.core.animateDpAsState
-import com.example.algorithminterpreter.FreeWorkspaceBlocksArea
-import com.example.algorithminterpreter.PositionedBlock
 import androidx.compose.ui.geometry.Offset
 data class PositionedBlock(
     val block: Block,
@@ -46,6 +42,22 @@ fun ProjectScreen() {
         targetValue = if (blocksVisible) 300.dp else 0.dp
     )
 
+    fun recalculatePositions() {
+        val baseX = 300f
+        val baseY = 260f
+        val blockHeight = 150f
+        workspaceBlocks.forEachIndexed { index, positionedBlock ->
+            workspaceBlocks[index] = positionedBlock.copy(
+                position = Offset(baseX, baseY + index * blockHeight)
+            )
+        }
+    }
+
+    fun addBlockInOrder(block: Block) {
+        val baseX = 400f
+        workspaceBlocks.add(PositionedBlock(block, Offset(baseX, 0f), ""))
+        recalculatePositions()
+    }
 
     Box(
         modifier = Modifier
@@ -134,7 +146,10 @@ fun ProjectScreen() {
                     fontSize = 24.sp
                 )
                 Button(
-                    onClick = {workspaceBlocks.clear()},
+                    onClick = {
+                        workspaceBlocks.clear()
+                        recalculatePositions()
+                    },
                     modifier = Modifier
                         .padding(end = 16.dp)
                         .height(55.dp)
@@ -191,12 +206,7 @@ fun ProjectScreen() {
                 .background(Color(0xFFE0DDFF)),
         ) {
             BlockPanel { block ->
-                val baseX = 400f
-                val baseY = 200f
-                val blockHeight = 80f
-                val newY = baseY + workspaceBlocks.size * blockHeight
-                val offset = Offset(baseX, newY)
-                workspaceBlocks.add(PositionedBlock(block, offset, ""))
+                addBlockInOrder(block)
                 blocksVisible = false
             }
             Image(

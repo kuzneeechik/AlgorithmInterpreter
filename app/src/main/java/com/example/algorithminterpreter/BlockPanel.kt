@@ -55,7 +55,7 @@ fun BlockPanel(onBlockClick: (Block) -> Unit) {
                 modifier = Modifier
                     .padding(vertical = 4.dp)
                     .background(block.color, RoundedCornerShape(8.dp))
-                    .clickable { onBlockClick(block.copy(id = System.currentTimeMillis().toInt())) }
+                    .clickable { onBlockClick(block) }
             ) {
                 BlockView(
                     block = block,
