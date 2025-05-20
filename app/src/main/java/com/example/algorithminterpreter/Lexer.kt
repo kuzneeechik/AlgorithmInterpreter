@@ -4,7 +4,7 @@ class Lexer(private var code: String) {
     private var pos: Int = 0
     val tokens: MutableList<Token> = mutableListOf()
 
-    fun lexAnalysis(): MutableList<Token>
+    fun lexAnalysis()
     {
         val codeLength: Int = code.length
 
@@ -12,8 +12,6 @@ class Lexer(private var code: String) {
         {
             /* to do */
         }
-
-        return tokens
     }
 
     private fun nextToken(codeLength: Int): Boolean
