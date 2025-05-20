@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -21,6 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,7 +31,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -127,7 +128,7 @@ fun BlockView(
                 Text(
                     text = "0",
                     color = Color(0xFFD0D0D0),
-                    fontSize = 25.sp,
+                    fontSize = 28.sp,
                     fontWeight = FontWeight.Normal
                 )
             }
@@ -153,7 +154,7 @@ fun BlockView(
                     singleLine = true,
                     enabled = isInteractive,
                     textStyle = androidx.compose.ui.text.TextStyle(
-                        fontSize = 22.sp,
+                        fontSize = 25.sp,
                         color = Color(0xFFD0D0D0),
                         fontWeight = FontWeight.Normal,
                         textAlign = androidx.compose.ui.text.style.TextAlign.Center
@@ -162,7 +163,7 @@ fun BlockView(
                         Text(
                             text = "0",
                             color = Color(0xFFD0D0D0),
-                            fontSize = 22.sp,
+                            fontSize = 25.sp,
                             fontWeight = FontWeight.Normal,
                             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                             modifier = Modifier.fillMaxWidth()
@@ -222,12 +223,12 @@ fun BlockView(
                     },
                     modifier = Modifier
                         .fillMaxSize()
-                        .height(56.dp),
+                    .height(56.dp),
 
                     singleLine = true,
                     enabled = isInteractive,
                     textStyle = androidx.compose.ui.text.TextStyle(
-                        fontSize = 22.sp,
+                        fontSize = 18.sp,
                         color = Color(0xFFFFFFFF),
                         fontWeight = FontWeight.Normal,
                         textAlign = androidx.compose.ui.text.style.TextAlign.Center
@@ -236,7 +237,7 @@ fun BlockView(
                         Text(
                             text = "X",
                             color = Color(0xFFD0D0D0),
-                            fontSize = 22.sp,
+                            fontSize = 18.sp,
                             fontWeight = FontWeight.Normal,
                             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                             modifier = Modifier.fillMaxWidth()
@@ -257,55 +258,53 @@ fun BlockView(
         }
     }
     else if (block.id in 1..5) {
-        Box(
-            modifier = Modifier
-                .width(120.dp)
-                .height(56.dp)
-                .background(block.color, RoundedCornerShape(cornerRadius))
-                .border(2.dp, Color.White, RoundedCornerShape(cornerRadius))
-                .padding(8.dp)
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start,
-                modifier = Modifier.fillMaxSize()
-
+            Box(
+                modifier = Modifier
+                    .width(120.dp)
+                    .height(56.dp)
+                    .background(block.color, RoundedCornerShape(cornerRadius))
+                    .border(2.dp, Color.White, RoundedCornerShape(cornerRadius))
+                    .padding(8.dp)
             ) {
-                Text(
-                    text = block.text,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 32.sp,
-                    modifier = Modifier
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start,
+                    modifier = Modifier.fillMaxSize()
 
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                OutlinedTextField(
-                    value = inputValue,
-                    onValueChange = onInputChange,
-                    modifier = Modifier
-                        .fillMaxWidth()
+                ) {
+                    Text(
+                        text = block.text,
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 32.sp,
+                        modifier = Modifier
 
-                        .height(56.dp),
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    OutlinedTextField(
+                        value = inputValue,
+                        onValueChange = onInputChange,
+                        modifier = Modifier
+                            .fillMaxWidth()
 
-                    singleLine = true,
-                    textStyle = TextStyle(
-                        fontSize = 22.sp, ),
-                    enabled = isInteractive,
-                    colors = androidx.compose.material3.TextFieldDefaults.outlinedTextFieldColors(
-                        containerColor = Color(0xFF2F860D),
-                        focusedBorderColor = Color.White,
-                        unfocusedBorderColor = Color.White,
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White,
-                        cursorColor = Color.White,
-                        disabledTextColor = Color.White,
-                        disabledBorderColor = Color.White
-                    ),
-                    shape = RoundedCornerShape(cornerRadius)
-                )
+                            .height(40.dp),
+
+                        singleLine = true,
+                        enabled = isInteractive,
+                        colors = androidx.compose.material3.TextFieldDefaults.outlinedTextFieldColors(
+                            containerColor = Color(0xFF2F860D),
+                            focusedBorderColor = Color.White,
+                            unfocusedBorderColor = Color.White,
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.White,
+                            cursorColor = Color.White,
+                            disabledTextColor = Color.White,
+                            disabledBorderColor = Color.White
+                        ),
+                        shape = RoundedCornerShape(cornerRadius)
+                    )
+                }
             }
-        }
 
 
     } else if (block.id in 6..11) {
@@ -322,67 +321,67 @@ fun BlockView(
             else -> ""
         }
 
-        // Только визуализация (панель блоков)
-        Box(
-            modifier = Modifier
-                .width(180.dp)
-                .height(56.dp)
-                .background(block.color, RoundedCornerShape(cornerRadius))
-                .border(2.dp, Color.White, RoundedCornerShape(cornerRadius))
-                .padding(8.dp)
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxSize()
+            // Только визуализация (панель блоков)
+            Box(
+                modifier = Modifier
+                    .width(180.dp)
+                    .height(56.dp)
+                    .background(block.color, RoundedCornerShape(cornerRadius))
+                    .border(2.dp, Color.White, RoundedCornerShape(cornerRadius))
+                    .padding(8.dp)
             ) {
-                OutlinedTextField(
-                    value = left,
-                    onValueChange = { newLeft -> onInputChange("$newLeft|$right") },
-                    modifier = Modifier
-                        .width(78.dp)
-                        .height(40.dp),
-                    singleLine = true,
-                    enabled = isInteractive,
-                    colors = androidx.compose.material3.TextFieldDefaults.outlinedTextFieldColors(
-                        containerColor = Color(0xFFF89402),
-                        focusedBorderColor = Color.White,
-                        unfocusedBorderColor = Color.White,
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White,
-                        cursorColor = Color.White,
-                        disabledTextColor = Color.White,
-                        disabledBorderColor = Color.White
-                    ),
-                    shape = RoundedCornerShape(cornerRadius)
-                )
-                Text(
-                    text = operator,
-                    color = Color.White,
-                    fontSize = 35.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(horizontal = 8.dp)
-                )
-                OutlinedTextField(
-                    value = left,
-                    onValueChange = { newLeft -> onInputChange("$newLeft|$right") },
-                    modifier = Modifier
-                        .width(78.dp)
-                        .height(40.dp),
-                    singleLine = true,
-                    enabled = isInteractive,
-                    colors = androidx.compose.material3.TextFieldDefaults.outlinedTextFieldColors(
-                        containerColor = Color(0xFFF89402),
-                        focusedBorderColor = Color.White,
-                        unfocusedBorderColor = Color.White,
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White,
-                        cursorColor = Color.White,
-                        disabledTextColor = Color.White,
-                        disabledBorderColor = Color.White
-                    ),
-                    shape = RoundedCornerShape(cornerRadius)
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    OutlinedTextField(
+                        value = left,
+                        onValueChange = { newLeft -> onInputChange("$newLeft|$right") },
+                        modifier = Modifier
+                            .width(78.dp)
+                            .height(40.dp),
+                        singleLine = true,
+                        enabled = isInteractive,
+                        colors = androidx.compose.material3.TextFieldDefaults.outlinedTextFieldColors(
+                            containerColor = Color(0xFFF89402),
+                            focusedBorderColor = Color.White,
+                            unfocusedBorderColor = Color.White,
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.White,
+                            cursorColor = Color.White,
+                            disabledTextColor = Color.White,
+                            disabledBorderColor = Color.White
+                        ),
+                        shape = RoundedCornerShape(cornerRadius)
+                    )
+                    Text(
+                        text = operator,
+                        color = Color.White,
+                        fontSize = 35.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(horizontal = 8.dp)
+                    )
+                    OutlinedTextField(
+                        value = left,
+                        onValueChange = { newLeft -> onInputChange("$newLeft|$right") },
+                        modifier = Modifier
+                            .width(78.dp)
+                            .height(40.dp),
+                        singleLine = true,
+                        enabled = isInteractive,
+                        colors = androidx.compose.material3.TextFieldDefaults.outlinedTextFieldColors(
+                            containerColor = Color(0xFFF89402),
+                            focusedBorderColor = Color.White,
+                            unfocusedBorderColor = Color.White,
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.White,
+                            cursorColor = Color.White,
+                            disabledTextColor = Color.White,
+                            disabledBorderColor = Color.White
+                        ),
+                        shape = RoundedCornerShape(cornerRadius)
+                    )
 
             }
         }
