@@ -113,7 +113,7 @@ fun BlockView(
     onInputChange: (String) -> Unit = {},
 ) {
     val borderWidth = if (isSelected) 4.dp else 2.dp
-    val cornerRadius = 6.dp // Унифицированное закругление для всех кнопок
+    val cornerRadius = 6.dp
 
     if (block.id == 23) {
         if (!isEditable) {
@@ -216,7 +216,7 @@ fun BlockView(
                 OutlinedTextField(
                     value = inputValue,
                     onValueChange = { newValue ->
-                        // Разрешаем только английские буквы
+                        //  только английские буквы
                         if (newValue.isEmpty() || newValue.all { it.isLetter() && it.isEnglishLetter() }) {
                             onInputChange(newValue)
                         }
@@ -320,8 +320,6 @@ fun BlockView(
             11 -> "!="
             else -> ""
         }
-
-            // Только визуализация (панель блоков)
             Box(
                 modifier = Modifier
                     .width(180.dp)
@@ -392,18 +390,18 @@ fun BlockView(
         val right = parts.getOrNull(1) ?: ""
         Box(
             modifier = Modifier
-                .width(200.dp) // уменьшили ширину
+                .width(200.dp)
                 .height(56.dp)
                 .background(Color(0xFFD25AE0), RoundedCornerShape(cornerRadius))
                 .border(2.dp, Color.White, RoundedCornerShape(cornerRadius))
-                .padding(horizontal = 2.dp) // минимальный паддинг
+                .padding(horizontal = 2.dp)
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
                 modifier = Modifier.fillMaxSize()
             ) {
-                // Левая круглая скобка
+
                 Text(
                     text = "(",
                     color = Color.White,
@@ -411,7 +409,7 @@ fun BlockView(
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(end = 2.dp)
                 )
-                // Первое поле
+
                 OutlinedTextField(
                     value = left,
                     onValueChange = { newLeft -> onInputChange("$newLeft|$right") },
@@ -433,7 +431,7 @@ fun BlockView(
                     shape = RoundedCornerShape(cornerRadius)
                 )
                 Spacer(modifier = Modifier.width(2.dp))
-                // Второе поле
+
                 OutlinedTextField(
                     value = right,
                     onValueChange = { newRight -> onInputChange("$left|$newRight") },
@@ -454,7 +452,7 @@ fun BlockView(
                     ),
                     shape = RoundedCornerShape(cornerRadius)
                 )
-                // Правая круглая скобка
+
                 Text(
                     text = ")",
                     color = Color.White,
@@ -466,23 +464,23 @@ fun BlockView(
         }
     }
     else if(block.id  == 16) {
-        // Блок if с кастомным оформлением
+
         Box(
             modifier = Modifier
                 .width(220.dp)
                 .height(80.dp)
                 .background(Color(0xFFF89402), RoundedCornerShape(cornerRadius))
         ) {
-            // Рисуем выступы и левую полосу
+
             Canvas(modifier = Modifier.matchParentSize()) {
-                // Левая вертикальная полоса
+
                 drawRoundRect(
                     color = Color(0xFFF89402),
                     topLeft = Offset(0f, 0f),
                     size = Size(16.dp.toPx(), size.height),
                     cornerRadius = CornerRadius(8.dp.toPx(), 8.dp.toPx())
                 )
-                // Нижний выступ
+
                 drawRect(
                     color = Color(0xFFF89402),
                     topLeft = Offset(16.dp.toPx(), size.height - 18.dp.toPx()),
