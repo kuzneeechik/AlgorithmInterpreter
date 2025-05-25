@@ -1,6 +1,5 @@
 package com.example.algorithminterpreter
 import com.example.algorithminterpreter.ast.*
-import java.lang.Exception
 
 class Parser(private val tokens: List<Token>)
 {
@@ -50,6 +49,16 @@ class Parser(private val tokens: List<Token>)
 
         if (variable != null)
         {
+            skipSpaces()
+
+            if (match(tokenTypeList.find { it.name == "LEFT BRACKET" }!!) != null)
+            {
+                val index = parseFormula()
+                require(tokenTypeList.find {it.name == "RIGHT BRACKET"}!!)
+
+                return ArrayNode(variable, index)
+            }
+
             return VariableNode(variable)
         }
 
@@ -58,8 +67,6 @@ class Parser(private val tokens: List<Token>)
 
     private fun parseParentheses(): ExpressionNode
     {
-        skipSpaces()
-        
         if (match(tokenTypeList.find { it.name == "LEFT PAR" }!!) != null)
         {
             val node = parseFormula()
@@ -105,6 +112,7 @@ class Parser(private val tokens: List<Token>)
 
     private fun parseFormula(): ExpressionNode
     {
+        skipSpaces()
         var leftNode = parsePriorities()
         skipSpaces()
 
@@ -166,6 +174,19 @@ class Parser(private val tokens: List<Token>)
 
         if (tokenInit != null)
         {
+            val variable = match(tokenTypeList.find { it.name == "VARIABLE" }!!)
+                ?: throw Error("Variable name expected after 'int'")
+
+            skipSpaces()
+
+            if (match(tokenTypeList.find { it.name == "LEFT BRACKET"}!!) != null)
+            {
+                val size = parseFormula()
+                require(tokenTypeList.find { it.name == "RIGHT BRACKET"}!!)
+
+                return ArrayInitNode(variable, size)
+            }
+
             return UnarOperationNode(tokenInit, parseVariableOrNumber())
         }
 
@@ -179,9 +200,11 @@ class Parser(private val tokens: List<Token>)
             if (match(tokenTypeList.find { it.name == "IF" }!!) != null)
             {
                 pos -= 1
+
                 return parseIf()
             }
-            if (match(tokenTypeList.find { it.name == "WRITE" }!!) != null)
+
+            else if (match(tokenTypeList.find { it.name == "WRITE" }!!) != null)
             {
                 pos -= 1
 
@@ -236,18 +259,23 @@ class Parser(private val tokens: List<Token>)
         while (true)
         {
             skipSpaces()
+
             if (match(tokenTypeList.find { it.name == "ELSE" }!!) != null) break
+
             if (match(tokenTypeList.find { it.name == "ENDIF" }!!) != null)
             {
                 return IfNode(condition, trueBranch, null)
             }
+
             trueBranch.addNode(parseExpression())
         }
 
         while (true)
         {
             skipSpaces()
+
             if (match(tokenTypeList.find { it.name == "ENDIF" }!!) != null) break
+
             falseBranch.addNode(parseExpression())
         }
 
@@ -274,6 +302,7 @@ class Parser(private val tokens: List<Token>)
             val rightNode = parseFormula()
             BinOperationNode(operator, leftNode, rightNode)
         }
+
         else
         {
             leftNode
@@ -291,8 +320,10 @@ class Parser(private val tokens: List<Token>)
 
             val codeStringNode = parseExpression()
             root.addNode(codeStringNode)
+
             skipSpaces()
         }
+
         return root
     }
 
@@ -318,8 +349,31 @@ class Parser(private val tokens: List<Token>)
                     "UM" -> return (run(node.leftNode) as Long) >= (run(node.rightNode) as Long)
                     "ASSIGN" -> {
                         val result = run(node.rightNode)
-                        val variableNode = node.leftNode as VariableNode
-                        scope[variableNode.variable.text] = result!!
+
+                        when (val left = node.leftNode)
+                        {
+                            is VariableNode -> {
+                                val variableNode = node.leftNode as VariableNode
+                                scope[variableNode.variable.text] = result!!
+                            }
+
+                            is ArrayNode -> {
+                                val array = (scope[left.array.text] as? ArrayValue)?.array
+                                    ?: throw Error("Variable ${left.array.text} is not an array")
+
+                                val index = run(left.index) as Long
+
+                                if (index !in 0 until array.size)
+                                {
+                                    throw Error("Index $index out of range")
+                                }
+
+                                array[index.toInt()] = result as Long
+                            }
+
+                            else -> throw Error("Left side must be variable or array")
+                        }
+
                         return result
                     }
                 }
@@ -354,7 +408,8 @@ class Parser(private val tokens: List<Token>)
             }
 
             is VariableNode -> {
-                return scope[node.variable.text] ?: "The variable with name ${node.variable.text} not found"
+                return scope[node.variable.text] ?:
+                "The variable with name ${node.variable.text} not found"
             }
 
             is StatementsNode -> {
@@ -363,6 +418,7 @@ class Parser(private val tokens: List<Token>)
 
             is IfNode -> {
                 val result = run(node.condition)
+
                 if (result is Boolean && result)
                 {
                     run(node.trueBranch)
@@ -371,6 +427,33 @@ class Parser(private val tokens: List<Token>)
                 {
                     node.falseBranch?.let { run(it) }
                 }
+            }
+
+            is ArrayInitNode -> {
+                val size = run(node.size) as Long
+
+                if (size <= 0)
+                {
+                    throw Error("Array size must be positive")
+                }
+
+                val array = MutableList(size.toInt()) { 0L }
+
+                scope[node.array.text] = ArrayValue(array)
+            }
+
+            is ArrayNode -> {
+                val array = (scope[node.array.text] as? ArrayValue)?.array
+                    ?: throw Error("Variable ${node.array.text} is not an array")
+
+                val index = run(node.index) as Long
+
+                if (index !in 0 until array.size)
+                {
+                    throw Error("Index $index out of range")
+                }
+
+                return array[index.toInt()]
             }
 
             else -> println("Error!")
