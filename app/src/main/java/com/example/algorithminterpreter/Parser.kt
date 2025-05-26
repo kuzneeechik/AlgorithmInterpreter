@@ -433,15 +433,33 @@ class Parser(private val tokens: List<Token>)
                     "READ" -> {
                         val value = readln().toLongOrNull() ?: throw Error("Incorrect input")
 
-                        val variableNode = node.operand as VariableNode
+                        when (val currentNode = node.operand)
+                        {
+                            is VariableNode -> {
+                                if (scope[currentNode.variable.text] == null)
+                                {
+                                    println("The variable with name ${currentNode.variable.text} not found")
+                                }
+                                else
+                                {
+                                    scope[currentNode.variable.text] = value
+                                }
+                            }
 
-                        if (scope[variableNode.variable.text] == null)
-                        {
-                            println("The variable with name ${variableNode.variable.text} not found")
-                        }
-                        else
-                        {
-                            scope[variableNode.variable.text] = value
+                            is ArrayNode -> {
+                                val arrayData = (scope[currentNode.array.text] as? ArrayValue)?.array
+                                    ?: throw Error("Variable ${currentNode.array.text} is not an array")
+
+                                val index = run(currentNode.index) as Long
+
+                                if (index !in 0 until arrayData.size) {
+                                    throw Error("Index $index out of range")
+                                }
+
+                                arrayData[index.toInt()] = value
+                            }
+
+                            else -> throw Error("Operand for READ must be a variable or an array element")
                         }
                     }
                     "INIT" -> {
@@ -504,6 +522,7 @@ class Parser(private val tokens: List<Token>)
                 while (true)
                 {
                     val conditionResult = run(node.condition)
+
                     if (conditionResult is Boolean && conditionResult)
                     {
                         try {
@@ -514,7 +533,6 @@ class Parser(private val tokens: List<Token>)
                             continue
                         }
                     }
-
                     else
                     {
                         break
