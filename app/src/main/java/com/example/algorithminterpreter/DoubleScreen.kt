@@ -26,6 +26,7 @@ data class PositionedBlock(
     var inputValue: String = ""
 )
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProjectScreen() {
     var blocksVisible by remember { mutableStateOf(false) }
@@ -34,6 +35,7 @@ fun ProjectScreen() {
         targetValue = if (consoleVisible) (-298).dp else (0).dp
     )
     var workspaceBlocks = remember { mutableStateListOf<PositionedBlock>()}
+    var consoleInputText by remember { mutableStateOf("") }
 
     val check by animateDpAsState(
         targetValue = if (blocksVisible) 0.dp else (-300).dp
@@ -64,6 +66,7 @@ fun ProjectScreen() {
             .fillMaxSize()
             .background(Color(0xFFE0DDFF))
     ) {
+
         FreeWorkspaceBlocksArea(
             blocks = workspaceBlocks,
             selectedBlock = null,
@@ -99,13 +102,14 @@ fun ProjectScreen() {
                 .offset(y = checkConsoleBord)
                 .align(Alignment.BottomCenter)
                 .navigationBarsPadding()
-                .height(75.dp)
+                .height(85.dp)
                 .fillMaxWidth()
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color(0xFF5F52F0)),
+                    .background(Color(0xFF5F52F0))
+                    .height(85.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
@@ -116,7 +120,7 @@ fun ProjectScreen() {
                         .height(55.dp)
                         .border(2.dp, Color.White, RoundedCornerShape(25.dp)),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF6D60F8),
+                        containerColor = Color(0xFF5F52F0),
                         contentColor = Color.White
                     ),
                     contentPadding = PaddingValues(horizontal = 12.dp)
@@ -229,8 +233,47 @@ fun ProjectScreen() {
                     .height(298.dp)
                     .align(Alignment.BottomCenter)
                     .background(Color(0xFF8685C7))
-            )
+            ) {
+                TextField(
+                    value = consoleInputText,
+                    onValueChange = { consoleInputText = it },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp, vertical = 10.dp)
+                        .align(Alignment.TopCenter),
+                    placeholder = { Text("Введите текст...",
+                        fontWeight = FontWeight.Bold, fontSize = 22.sp,
+                        color = Color.White,letterSpacing = 2.sp) },
+                    textStyle = androidx.compose.ui.text.TextStyle(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 22.sp,
+                        color = Color.White,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Start,
+                        letterSpacing = 2.sp
+                    ),
+                    singleLine = false,
+                    colors = TextFieldDefaults.textFieldColors(
+                        containerColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Transparent,
+                        disabledIndicatorColor = Color.Transparent,
+                        cursorColor = Color.White
+                    )
+                )
+            }
         }
+
+        if (consoleVisible )
+        {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding())
+                    .align(Alignment.BottomCenter)
+                    .background(Color(0xFF8685C7))
+            ) {}
+        }
+
     }
 }
 
