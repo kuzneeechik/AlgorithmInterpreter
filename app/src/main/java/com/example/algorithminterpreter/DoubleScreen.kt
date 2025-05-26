@@ -220,8 +220,20 @@ fun ProjectScreen() {
                     .clickable { if (!consoleVisible) blocksVisible = !blocksVisible }
             )
         }
+
+        if (consoleVisible) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .navigationBarsPadding()
+                    .height(298.dp)
+                    .align(Alignment.BottomCenter)
+                    .background(Color(0xFF8685C7))
+            )
+        }
     }
 }
+
 
 @Preview
 @Composable
