@@ -179,8 +179,6 @@ class Parser(private val tokens: List<Token>)
             val variable = match(tokenTypeList.find { it.name == "VARIABLE" }!!)
                 ?: throw Error("Variable name expected after 'int'")
 
-            skipSpaces()
-
             if (match(tokenTypeList.find { it.name == "LEFT BRACKET"}!!) != null)
             {
                 val size = parseFormula()
@@ -188,6 +186,8 @@ class Parser(private val tokens: List<Token>)
 
                 return ArrayInitNode(variable, size)
             }
+
+            pos -= 1
 
             return UnarOperationNode(tokenInit, parseVariableOrNumber())
         }
