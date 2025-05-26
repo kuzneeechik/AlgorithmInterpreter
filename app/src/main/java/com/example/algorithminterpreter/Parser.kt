@@ -1,6 +1,8 @@
 package com.example.algorithminterpreter
 import com.example.algorithminterpreter.ast.*
 
+class BreakException : RuntimeException()
+class ContinueException : RuntimeException()
 class Parser(private val tokens: List<Token>)
 {
     private var pos: Int = 0
@@ -99,7 +101,7 @@ class Parser(private val tokens: List<Token>)
 
             leftNode = BinOperationNode(operator, leftNode, rightNode)
             skipSpaces()
-            
+
             operator = match(
                 tokenTypeList.find { it.name == "MULTI" }!!,
                 tokenTypeList.find { it.name == "DIV" }!!,
@@ -201,7 +203,8 @@ class Parser(private val tokens: List<Token>)
             {
                 pos -= 1
 
-                return parseIf()
+                val ifNode = parseIf()
+                return ifNode
             }
 
             else if (match(tokenTypeList.find { it.name == "WRITE" }!!) != null)
@@ -226,6 +229,26 @@ class Parser(private val tokens: List<Token>)
 
                 val initNode = parseInitialization()
                 return initNode
+            }
+
+            else if (match(tokenTypeList.find { it.name == "WHILE" }!!) != null)
+            {
+                pos -= 1
+
+                val whileNode = parseWhile()
+                return whileNode
+            }
+
+            else if (match(tokenTypeList.find { it.name == "BREAK" }!!) != null)
+            {
+                val breakNode = BreakNode()
+                return breakNode
+            }
+
+            else if (match(tokenTypeList.find { it.name == "CONTINUE" }!!) != null)
+            {
+                val continueNode = ContinueNode()
+                return continueNode
             }
         }
 
@@ -280,6 +303,27 @@ class Parser(private val tokens: List<Token>)
         }
 
         return IfNode(condition, trueBranch, falseBranch)
+    }
+
+    private fun parseWhile(): ExpressionNode
+    {
+        skipSpaces()
+        require(tokenTypeList.find { it.name == "WHILE" }!!)
+        skipSpaces()
+
+        val condition = parseComparison()
+        skipSpaces()
+
+        val body = StatementsNode()
+
+        while (true)
+        {
+            skipSpaces()
+            if (match(tokenTypeList.find { it.name == "ENDWHILE" }!!) != null) break
+            body.addNode(parseExpression())
+        }
+
+        return WhileNode(condition, body)
     }
 
     private fun parseComparison(): ExpressionNode
@@ -455,6 +499,32 @@ class Parser(private val tokens: List<Token>)
 
                 return array[index.toInt()]
             }
+
+            is WhileNode -> {
+                while (true)
+                {
+                    val conditionResult = run(node.condition)
+                    if (conditionResult is Boolean && conditionResult)
+                    {
+                        try {
+                            run(node.body)
+                        } catch (e: BreakException) {
+                            break
+                        } catch (e: ContinueException) {
+                            continue
+                        }
+                    }
+
+                    else
+                    {
+                        break
+                    }
+                }
+            }
+
+            is BreakNode -> throw BreakException()
+
+            is ContinueNode -> throw ContinueException()
 
             else -> println("Error!")
         }
