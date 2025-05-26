@@ -27,8 +27,8 @@ val tokenTypeList: MutableList<TokenType> = mutableListOf(
     TokenType("LEFT BRACKET", "^\\["),
     TokenType("RIGHT BRACKET", "^\\]"),
     TokenType("NUMBER", "^[0-9]+"),
-    TokenType("VARIABLE", "^[A-Za-z_][A-Za-z0-9_]*"),
     TokenType("WHILE", "^while"),
     TokenType("BREAK", "^break"),
     TokenType("CONTINUE", "^continue"),
-    TokenType("ENDWHILE", "^endwhile"))
+    TokenType("ENDWHILE", "^endwhile"),
+    TokenType("VARIABLE", "^[A-Za-z_][A-Za-z0-9_]*"))
