@@ -87,6 +87,7 @@ fun ProjectScreen() {
                 .height(150.dp)
                 .clickable { if (!consoleVisible) blocksVisible = !blocksVisible }
         )
+
         Row(
             modifier = Modifier
                 .statusBarsPadding()
@@ -101,9 +102,11 @@ fun ProjectScreen() {
             modifier = Modifier
                 .offset(y = checkConsoleBord)
                 .align(Alignment.BottomCenter)
+                .background(Color(0xFF5F52F0))
                 .navigationBarsPadding()
                 .height(85.dp)
                 .fillMaxWidth()
+
         ) {
             Row(
                 modifier = Modifier
@@ -274,6 +277,16 @@ fun ProjectScreen() {
             ) {}
         }
 
+        if (!consoleVisible && !blocksVisible)
+        {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding())
+                    .align(Alignment.BottomCenter)
+                    .background(Color(0xFF5F52F0))
+            ) {}
+        }
     }
 }
 
