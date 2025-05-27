@@ -244,11 +244,10 @@ fun ProjectScreen() {
                         .fillMaxWidth()
                         .padding(horizontal = 8.dp, vertical = 10.dp)
                         .align(Alignment.TopCenter),
-                    placeholder = { Text("Введите текст...",
-                        fontWeight = FontWeight.Bold, fontSize = 22.sp,
+                    placeholder = { Text("Введите текст:", fontSize = 22.sp,
                         color = Color.White,letterSpacing = 2.sp) },
                     textStyle = androidx.compose.ui.text.TextStyle(
-                        fontWeight = FontWeight.Bold,
+
                         fontSize = 22.sp,
                         color = Color.White,
                         textAlign = androidx.compose.ui.text.style.TextAlign.Start,

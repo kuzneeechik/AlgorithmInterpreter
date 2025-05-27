@@ -59,7 +59,7 @@ fun StartScreen(
                 onClick = onNewProject,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 50.dp)
+                    .padding(horizontal = 70.dp)
                     .border(4.dp, Color.White, RoundedCornerShape(25.dp)),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF6D60F8),
