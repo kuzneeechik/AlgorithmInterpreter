@@ -44,21 +44,13 @@ fun ProjectScreen() {
         targetValue = if (blocksVisible) 300.dp else 0.dp
     )
 
-    fun recalculatePositions() {
-        val baseX = 300f
-        val baseY = 260f
-        val blockHeight = 150f
-        workspaceBlocks.forEachIndexed { index, positionedBlock ->
-            workspaceBlocks[index] = positionedBlock.copy(
-                position = Offset(baseX, baseY + index * blockHeight)
-            )
-        }
-    }
+
 
     fun addBlockInOrder(block: Block) {
         val baseX = 400f
-        workspaceBlocks.add(PositionedBlock(block, Offset(baseX, 0f), ""))
-        recalculatePositions()
+        val arrayBlocks = workspaceBlocks.size+1
+        workspaceBlocks.add(PositionedBlock(block, Offset(baseX, 250f* arrayBlocks), ""))
+
     }
 
     Box(
@@ -68,6 +60,7 @@ fun ProjectScreen() {
     ) {
 
         FreeWorkspaceBlocksArea(
+
             blocks = workspaceBlocks,
             selectedBlock = null,
             onWorkspaceClick = {},
@@ -155,7 +148,7 @@ fun ProjectScreen() {
                 Button(
                     onClick = {
                         workspaceBlocks.clear()
-                        recalculatePositions()
+
                     },
                     modifier = Modifier
                         .padding(end = 16.dp)
