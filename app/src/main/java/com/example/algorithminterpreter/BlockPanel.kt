@@ -21,12 +21,20 @@ import java.util.UUID
 
 
 open class Block(val id: UUID, val text: String, val color: Color)
-class PrintBlock(id: UUID, ) :
-    Block(id = id, text = "print", color = Color(0xFF9A66FF)) {
+class ConsoleRead(id: UUID, ) :
+    Block(id = id, text = "console.read", color = Color(0xFF9A66FF)) {
     var valueInput: String = ""
     //сюда нужно  писать функцию связывания вашей части
     fun createId(): Block {
-        return PrintBlock(UUID.randomUUID())
+        return ConsoleRead(UUID.randomUUID())
+    }
+}
+class ConsoleWrite(id: UUID, ) :
+    Block(id = id, text = "console.write", color = Color(0xFF9A66FF)) {
+    var valueInput: String = ""
+    //сюда нужно  писать функцию связывания вашей части
+    fun createId(): Block {
+        return ConsoleWrite(UUID.randomUUID())
     }
 }
 
@@ -158,8 +166,8 @@ fun BlockPanel(onBlockClick: (Block) -> Unit) {
         If(UUID.randomUUID()),
         IfElse(UUID.randomUUID()),
         While(UUID.randomUUID()),
-        PrintBlock(UUID.randomUUID()) ,
-
+        ConsoleRead(UUID.randomUUID()) ,
+        ConsoleWrite(UUID.randomUUID())
     )
     Column(
         modifier = Modifier

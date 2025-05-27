@@ -38,7 +38,9 @@ fun StartScreen(
     Box(modifier = modifier
         .fillMaxSize()
         .statusBarsPadding()
+        .background(Color(0xFF5F52F0))
         .navigationBarsPadding()
+       
     ) {
         Column(
             modifier = Modifier
