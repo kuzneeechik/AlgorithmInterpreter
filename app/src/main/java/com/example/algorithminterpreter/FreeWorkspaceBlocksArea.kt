@@ -31,11 +31,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -45,6 +47,7 @@ import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -326,11 +329,29 @@ fun BlockView(
         is BlueInt -> {
             Box(
                 modifier = Modifier
-                    .width(120.dp)
-                    .height(56.dp)
-                    .background(color = Color.Blue, shape = ScratchBlockShape()),
+                    .background( shape = ScratchBlockShape(), color = Color(0xFF35C1FE))
+                    .width(160.dp)
+                    .height(80.dp),
                 contentAlignment = Alignment.Center
             ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(24.dp)
+                ) {
+                    Text(
+                        text = "int",
+                        color = Color.White,
+                        fontSize = 32.sp,
+                        fontWeight = FontWeight.Normal,
+                        textAlign = TextAlign.Start
+                    )
+                    Box(
+                        modifier = Modifier
+                            .width(56.dp)
+                            .height(57.dp)
+                            .border(2.dp, Color.White, RoundedCornerShape(8.dp))
+                    )
+                }
             }
 
         }
