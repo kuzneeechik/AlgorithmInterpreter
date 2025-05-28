@@ -4,13 +4,16 @@ import Block
 import BlueInt
 import BlueIntArray
 import ConsoleRead
+import ConsoleReadBlocks
 import ConsoleWrite
+import ConsoleWriteBlocks
 import Const
 import GreenAssignment
 import If
 import IfElse
+import IntBlock
+import IntBlockArray
 import Operation
-import ScratchBlockShape
 import Staples
 import Variable
 import While
@@ -88,7 +91,8 @@ fun FreeWorkspaceBlocksArea(
                 modifier = Modifier
                     .zIndex(if (isDragging) 1f else 0f)
                     .offset {
-                        val pos = if (isDragging) positionedBlock.position + dragOffset else positionedBlock.position
+                        val pos =
+                            if (isDragging) positionedBlock.position + dragOffset else positionedBlock.position
                         IntOffset(pos.x.roundToInt(), pos.y.roundToInt())
                     }
                     .pointerInput(index) {
@@ -137,91 +141,90 @@ fun BlockView(
     val cornerRadius = 6.dp
     when (block) {
         is ConsoleRead -> {
-                Box(
-                    modifier = Modifier
-                        .width(220.dp)
-                        .height(95.dp)
-                        .background(block.color, RoundedCornerShape(cornerRadius))
-                        .border(2.dp, Color.White, RoundedCornerShape(cornerRadius))
-                        .padding(8.dp)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        Text(
-                            text = block.text,
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 22.sp
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Box(
-                            modifier = Modifier
-                                .width(56.dp)
-                                .height(57.dp)
-                                .border(2.dp, Color.White, RoundedCornerShape(8.dp))
-                        ) { }
-                    }
-                }
-
-        }
-        is ConsoleWrite -> {
             Box(
                 modifier = Modifier
-                    .width(220.dp)
-                    .height(95.dp)
-                    .background(block.color, RoundedCornerShape(cornerRadius))
-                    .border(2.dp, Color.White, RoundedCornerShape(cornerRadius))
-                    .padding(8.dp)
+                    .background(shape = ConsoleReadBlocks(), color = Color(0xFF9A66FF))
+                    .width(250.dp)
+                    .height(90.dp),
+                contentAlignment = Alignment.Center
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxSize()
+                    horizontalArrangement = Arrangement.spacedBy(24.dp)
                 ) {
                     Text(
-                        text = block.text,
+                        text = "console.read",
                         color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 22.sp
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Normal,
+                        textAlign = TextAlign.Start
                     )
-                    Spacer(modifier = Modifier.width(4.dp))
                     Box(
                         modifier = Modifier
                             .width(56.dp)
                             .height(57.dp)
                             .border(2.dp, Color.White, RoundedCornerShape(8.dp))
-                    ) { }
+                    )
                 }
             }
 
+        }
+        is ConsoleWrite -> {
+            Box(
+                modifier = Modifier
+                    .background(shape = ConsoleWriteBlocks(), color = Color(0xFF9A66FF))
+                    .width(250.dp)
+                    .height(90.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(24.dp)
+                ) {
+                    Text(
+                        text = "console.write",
+                        color = Color.White,
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Normal,
+                        textAlign = TextAlign.Start
+                    )
+                    Box(
+                        modifier = Modifier
+                            .width(56.dp)
+                            .height(57.dp)
+                            .border(2.dp, Color.White, RoundedCornerShape(8.dp))
+                    )
+                }
+            }
         }
         is Operation -> {
 
             Box(
                 modifier = Modifier
-                    .width(120.dp)
+                    .width(135.dp)
                     .height(80.dp)
                     .background(block.color, RoundedCornerShape(cornerRadius))
                     .border(2.dp, Color.White, RoundedCornerShape(cornerRadius))
-                    .padding( 8.dp),
+                    .padding(8.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Start,
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(start = 10.dp, end = 5.dp)
 
                 ) {
                     Text(
                         text = block.text,
                         color = Color.White,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 32.sp,
+                        fontSize = 38.sp,
                         modifier = Modifier
+                            .padding( end = 15.dp)
 
                     )
-                    Spacer(modifier = Modifier.width(20.dp))
                     Box(
                         modifier = Modifier
                             .width(56.dp)
@@ -329,8 +332,8 @@ fun BlockView(
         is BlueInt -> {
             Box(
                 modifier = Modifier
-                    .background( shape = ScratchBlockShape(), color = Color(0xFF35C1FE))
-                    .width(160.dp)
+                    .background(shape = IntBlock(), color = Color(0xFF35C1FE))
+                    .width(150.dp)
                     .height(80.dp),
                 contentAlignment = Alignment.Center
             ) {
@@ -359,42 +362,48 @@ fun BlockView(
         is BlueIntArray -> {
             Box(
                 modifier = Modifier
-                    .width(120.dp)
-                    .height(56.dp)
-                    .background(block.color, RoundedCornerShape(cornerRadius))
-                    .border(2.dp, Color.White, RoundedCornerShape(cornerRadius))
-                    .padding(8.dp)
+                    .background(shape = IntBlockArray(), color = Color(0xFF35C1FE))
+                    .width(250.dp)
+                    .height(80.dp),
+                contentAlignment = Alignment.Center
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxSize()
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     Text(
-                        text = block.text,
+                        text = "int",
                         color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 22.sp
+                        fontSize = 32.sp,
+                        fontWeight = FontWeight.Normal,
+                        textAlign = TextAlign.Start
                     )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    OutlinedTextField(
-                        value = inputValue,
-                        onValueChange = onInputChange,
+                    Box(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .height(40.dp),
-                        singleLine = true,
-                        enabled = isInteractive,
-                        colors = androidx.compose.material3.TextFieldDefaults.outlinedTextFieldColors(
-                            containerColor = Color(0xFF35C1FE),
-                            focusedBorderColor = Color.White,
-                            unfocusedBorderColor = Color.White,
-                            focusedTextColor = Color.White,
-                            unfocusedTextColor = Color.White,
-                            cursorColor = Color.White,
-                            disabledTextColor = Color.White,
-                            disabledBorderColor = Color.White
-                        ),
-                        shape = RoundedCornerShape(cornerRadius)
+                            .width(56.dp)
+                            .height(57.dp)
+                            .border(2.dp, Color.White, RoundedCornerShape(8.dp))
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = "[",
+                        color = Color.White,
+                        fontSize = 40.sp,
+                        fontWeight = FontWeight.Normal,
+                        textAlign = TextAlign.Start
+                    )
+                    Box(
+                        modifier = Modifier
+                            .width(56.dp)
+                            .height(57.dp)
+                            .border(2.dp, Color.White, RoundedCornerShape(8.dp))
+                    )
+                    Text(
+                        text = "]",
+                        color = Color.White,
+                        fontSize = 40.sp,
+                        fontWeight = FontWeight.Normal,
+                        textAlign = TextAlign.Start
                     )
                 }
             }

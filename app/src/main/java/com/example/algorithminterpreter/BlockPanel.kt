@@ -149,10 +149,10 @@ fun BlockPanel(onBlockClick: (Block) -> Unit) {
         Variable(UUID.randomUUID()),
         Const(UUID.randomUUID()),
         Operation(UUID.randomUUID(), "+"),
-        Operation(UUID.randomUUID(), "%"),
-        Operation(UUID.randomUUID(), "*"),
         Operation(UUID.randomUUID(), "-"),
+        Operation(UUID.randomUUID(), "*"),
         Operation(UUID.randomUUID(), "/"),
+        Operation(UUID.randomUUID(), "%"),
         СomparisonOperation(UUID.randomUUID(), ">"),
         СomparisonOperation(UUID.randomUUID(), "<"),
         СomparisonOperation(UUID.randomUUID(), ">="),
@@ -175,7 +175,7 @@ fun BlockPanel(onBlockClick: (Block) -> Unit) {
             .navigationBarsPadding()
             .statusBarsPadding()
             .verticalScroll(rememberScrollState())
-            .padding(8.dp),
+            .padding(10.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         val onRow = mutableListOf<Block>()
@@ -197,7 +197,7 @@ fun BlockPanel(onBlockClick: (Block) -> Unit) {
                 {
                     Box(
                         modifier = Modifier
-                            .padding(vertical = 4.dp)
+                            .padding(vertical = 12.dp)
                             .background(block.color, RoundedCornerShape(8.dp))
                             .clickable { onBlockClick(onRow[1]) }
                     ) {
@@ -215,7 +215,7 @@ fun BlockPanel(onBlockClick: (Block) -> Unit) {
                     )
                     Box(
                         modifier = Modifier
-                            .padding(vertical = 4.dp)
+                            .padding(vertical = 16.dp)
                             .background(block.color, RoundedCornerShape(8.dp))
                             .clickable { onBlockClick(onRow[0]) }
                     ) {
@@ -232,8 +232,7 @@ fun BlockPanel(onBlockClick: (Block) -> Unit) {
             if (block !is Const && block !is Variable) {
                 Box(
                     modifier = Modifier
-                        .padding(vertical = 4.dp)
-                        .background(block.color, RoundedCornerShape(8.dp))
+                        .padding(vertical = 12.dp)
                         .clickable { onBlockClick(block) }
                 ) {
                     BlockView(
