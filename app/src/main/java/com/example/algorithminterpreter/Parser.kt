@@ -464,7 +464,7 @@ class Parser(private val tokens: List<Token>)
                     }
                     "INIT" -> {
                         val variableNode = node.operand as VariableNode
-                        scope[variableNode.variable.text] = 0
+                        scope[variableNode.variable.text] = 0L
                     }
                 }
             }

@@ -20,149 +20,93 @@ import com.example.algorithminterpreter.BlockView
 import java.util.UUID
 
 
-open class Block(val id: UUID, val text: String, val color: Color)
-class ConsoleRead(id: UUID, ) :
-    Block(id = id, text = "console.read", color = Color(0xFF9A66FF)) {
-    var valueInput: String = ""
-    //сюда нужно  писать функцию связывания вашей части
-    fun createId(): Block {
-        return ConsoleRead(UUID.randomUUID())
-    }
-}
-class ConsoleWrite(id: UUID, ) :
-    Block(id = id, text = "console.write", color = Color(0xFF9A66FF)) {
-    var valueInput: String = ""
-    //сюда нужно  писать функцию связывания вашей части
-    fun createId(): Block {
-        return ConsoleWrite(UUID.randomUUID())
-    }
+open class Block(val id: UUID, val color: Color)
+
+class Const(id: UUID) : Block(id, Color(0xFF057CDE)) {
+    var value: String = ""
 }
 
-class Operation(id: UUID, text: String) :
-    Block(id = id, text = text, color = Color(0xFF2F860D)) {
-    var valueInput: String = ""
-    //сюда нужно  писать функцию связывания вашей части
-    fun createId(): Block {
-        return Operation(UUID.randomUUID(),text)
-    }
+class Variable(id: UUID) : Block(id, Color(0xFF35C1FE)) {
+    var name: String = ""
 }
 
-class СomparisonOperation(id: UUID, text: String) :
-    Block(id = id, text = text, color = Color(0xFFF89402)) {
-    var valueInput:  String = ""
-    //сюда нужно  писать функцию связывания вашей части
-    var leftInput: String = ""
-    var rightInput: String = ""
-    fun createId(): Block {
-        return СomparisonOperation(UUID.randomUUID(),text)
-    }
+class ArrayElem(id: UUID) : Block(id, Color(0xFF35C1FE)) {
+    var name: String = ""
+    var index: String = ""
 }
 
-class While(id: UUID) :
-    Block(id = id, text = "while", color = Color(0xFFFF5755)) {
-    var valueInput: String = ""
-    //сюда нужно  писать функцию связывания вашей части
-    fun createId(): Block {
-        return While(UUID.randomUUID())
+class ArithmeticOperation(id: UUID, val operator: String) :
+    Block(id, Color(0xFF2F860D)) {
+    var right: Block? = null
     }
+
+class ComparisonOperation(id: UUID, val operator: String) :
+    Block(id, Color(0xFFF89402)) {
+    var left: Block? = null
+    var right: Block? = null
+    }
+
+class Assignment(id: UUID) : Block(id, Color(0xFF71C94F)) {
+    var variable: Variable? = null
+    var value: Block? = null
 }
 
-
-class Staples(id: UUID, ) :
-    Block(id = id, text = "", color = Color(0xFFBA68C8)) {
-    var valueInput: String = ""
-    //сюда нужно  писать функцию связывания вашей части
-
-    fun createId(): Block {
-        return Staples(UUID.randomUUID())
-    }
+class If(id: UUID) : Block(id, Color(0xFFFFAD19)) {
+    var condition: Block? = null
+    var body: List<Block> = emptyList()
 }
 
-
-class If(id: UUID, ) :
-    Block(id = id, text = "if", color = Color(0xFFFFAD19)) {
-    var valueInput: String = ""
-    //сюда нужно  писать функцию связывания вашей части
-
-    fun createId(): Block {
-        return If(UUID.randomUUID())
-    }
+class IfElse(id: UUID) : Block(id, Color(0xFFFFAD19)) {
+    var condition: List<Block> = emptyList()
+    var ifBody: List<Block> = emptyList()
+    var elseBody: List<Block> = emptyList()
 }
 
-class Const(id: UUID, ) :
-    Block(id = id, text = "0", color = Color(0xFF057CDE)) {
-    var valueInput: String = ""
-    //сюда нужно  писать функцию связывания вашей части
-
-    fun createId(): Block {
-        return Const(UUID.randomUUID())
-    }
-}
-class Variable(id: UUID, ) :
-    Block(id = id, text = "X", color = Color(0xFF35C1FE)) {
-    var valueInput: String = ""
-    //сюда нужно  писать функцию связывания вашей части
-
-    fun createId(): Block {
-        return Variable(UUID.randomUUID())
-    }
+class While(id: UUID) : Block(id, Color(0xFFFF5755)) {
+    var condition: List<Block> = emptyList()
+    var body: List<Block> = emptyList()
 }
 
-class IfElse(id: UUID, ) :
-    Block(id = id, text = "ifElsee", color = Color(0xFFFFAD19)) {
-    var valueInput: String = ""
-    //сюда нужно  писать функцию связывания вашей части
+class ConsoleRead(id: UUID) : Block(id, Color(0xFF9A66FF)) {
+    var elem: Block? = null
+}
 
-    fun createId(): Block {
-        return IfElse(UUID.randomUUID())
-    }
+class ConsoleWrite(id: UUID) : Block(id, Color(0xFF9A66FF)) {
+    var elem: Block? = null
 }
-class BlueInt(id: UUID, ) :
-    Block(id = id, text = "int", color = Color(0xFF35C1FE)) {
-    var valueInput: String = ""
-    //сюда нужно  писать функцию связывания вашей части
-    fun createId(): Block {
-        return BlueInt(UUID.randomUUID())
-    }
-}
-class BlueIntArray(id: UUID, ) :
-    Block(id = id, text = "int[]", color = Color(0xFF35C1FE)) {
-    var valueInput: String = ""
-    //сюда нужно  писать функцию связывания вашей части
 
-    fun createId(): Block {
-        return BlueIntArray(UUID.randomUUID())
-    }
+class Staples(id: UUID) : Block(id, Color(0xFFBA68C8)) {
+    var elem: List<Block> = emptyList()
 }
-class GreenAssignment(id: UUID, ) :
-    Block(id = id, text = "X=", color = Color(0xFF71C94F)) {
-    var valueInput: String = ""
-    //сюда нужно  писать функцию связывания вашей части
 
-    fun createId(): Block {
-        return GreenAssignment(UUID.randomUUID())
-    }
+class IntVariable(id: UUID) : Block(id, Color(0xFF35C1FE)) {
+    var variable: String = ""
 }
+class IntArray(id: UUID) : Block(id, Color(0xFF35C1FE)) {
+    var variable: String = ""
+    var size: String = ""
+}
+
 @Composable
 fun BlockPanel(onBlockClick: (Block) -> Unit) {
     val blocks = listOf(
         Variable(UUID.randomUUID()),
         Const(UUID.randomUUID()),
-        Operation(UUID.randomUUID(), "+"),
-        Operation(UUID.randomUUID(), "%"),
-        Operation(UUID.randomUUID(), "*"),
-        Operation(UUID.randomUUID(), "-"),
-        Operation(UUID.randomUUID(), "/"),
-        СomparisonOperation(UUID.randomUUID(), ">"),
-        СomparisonOperation(UUID.randomUUID(), "<"),
-        СomparisonOperation(UUID.randomUUID(), ">="),
-        СomparisonOperation(UUID.randomUUID(), "<="),
-        СomparisonOperation(UUID.randomUUID(), "=="),
-        СomparisonOperation(UUID.randomUUID(), "!="),
+        ArithmeticOperation(UUID.randomUUID(), "+"),
+        ArithmeticOperation(UUID.randomUUID(), "%"),
+        ArithmeticOperation(UUID.randomUUID(), "*"),
+        ArithmeticOperation(UUID.randomUUID(), "-"),
+        ArithmeticOperation(UUID.randomUUID(), "/"),
+        ComparisonOperation(UUID.randomUUID(), ">"),
+        ComparisonOperation(UUID.randomUUID(), "<"),
+        ComparisonOperation(UUID.randomUUID(), ">="),
+        ComparisonOperation(UUID.randomUUID(), "<="),
+        ComparisonOperation(UUID.randomUUID(), "=="),
+        ComparisonOperation(UUID.randomUUID(), "!="),
         Staples(UUID.randomUUID()),
-        BlueInt(UUID.randomUUID()),
-        BlueIntArray(UUID.randomUUID()),
-        GreenAssignment(UUID.randomUUID()),
+        IntVariable(UUID.randomUUID()),
+        IntArray(UUID.randomUUID()),
+        Assignment(UUID.randomUUID()),
         If(UUID.randomUUID()),
         IfElse(UUID.randomUUID()),
         While(UUID.randomUUID()),
