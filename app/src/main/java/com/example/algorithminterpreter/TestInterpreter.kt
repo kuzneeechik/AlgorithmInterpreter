@@ -2,8 +2,8 @@ package com.example.algorithminterpreter
 
 fun main()
 {
-    val code = "int x console.read x console.write x + 45 * 2"
-
+    val code = "int mas[3] int i i = 0 while i < 3 console.read mas[i] i = i + 1 endwhile" +
+            "i = 0 while i < 3 console.write mas[i] i = i + 1 endwhile"
     val lexer = Lexer(code)
     lexer.lexAnalysis()
 
