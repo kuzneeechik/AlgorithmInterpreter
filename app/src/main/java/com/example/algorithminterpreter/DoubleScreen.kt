@@ -1,5 +1,6 @@
 package com.example.algorithminterpreter
 
+import androidx.compose.animation.core.RepeatMode
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -17,7 +18,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.algorithminterpreter.ui.theme.AlgorithmInterpreterTheme
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
+import kotlinx.coroutines.delay
+
 data class PositionedBlock(
     val block: Block,
     var position: Offset,
@@ -220,7 +230,23 @@ fun ProjectScreen() {
                     .clickable { if (!consoleVisible) blocksVisible = !blocksVisible }
             )
         }
-
+        var consoleInputText by remember { mutableStateOf("") }
+        var cursorVisible by remember { mutableStateOf(true) }
+        val cursorAlpha by animateFloatAsState(
+            targetValue = if (cursorVisible) { 1f }
+            else {0f}, //(видим/невидим)
+            animationSpec = infiniteRepeatable(
+                animation = tween(500),
+                repeatMode = RepeatMode.Reverse //это то что повтор
+            )
+        )
+// это запуск мигания
+        LaunchedEffect(Unit) {
+            while (true) {
+                delay(500)
+                cursorVisible = !cursorVisible
+            }
+        }
         if (consoleVisible) {
             Box(
                 modifier = Modifier
@@ -230,30 +256,38 @@ fun ProjectScreen() {
                     .align(Alignment.BottomCenter)
                     .background(Color(0xFF8685C7))
             ) {
-                TextField(
+                BasicTextField(
                     value = consoleInputText,
                     onValueChange = { consoleInputText = it },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 8.dp, vertical = 10.dp)
                         .align(Alignment.TopCenter),
-                    placeholder = { Text("Введите текст:", fontSize = 22.sp,
-                        color = Color.White,letterSpacing = 2.sp) },
-                    textStyle = androidx.compose.ui.text.TextStyle(
-
+                    textStyle = TextStyle(
                         fontSize = 22.sp,
                         color = Color.White,
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Start,
+                        textAlign = TextAlign.Start,
                         letterSpacing = 2.sp
                     ),
-                    singleLine = false,
-                    colors = TextFieldDefaults.textFieldColors(
-                        containerColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        focusedIndicatorColor = Color.Transparent,
-                        disabledIndicatorColor = Color.Transparent,
-                        cursorColor = Color.White
-                    )
+                    cursorBrush = SolidColor(Color.White.copy(alpha = cursorAlpha)),
+                    decorationBox = { innerTextField ->
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 8.dp),
+                            contentAlignment = Alignment.TopStart
+                        ) {
+                            innerTextField()
+                            if (consoleInputText.isEmpty()) {
+                                Box(
+                                    modifier = Modifier
+                                        .width(2.dp)
+                                        .height(24.dp)
+                                        .background(Color.White.copy(alpha = cursorAlpha))
+                                )
+                            }
+                        }
+                    }
                 )
             }
         }

@@ -8,17 +8,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.example.algorithminterpreter.BlockView
 import java.util.UUID
 
 open class Block(val id: UUID, val color: Color)
@@ -90,6 +83,7 @@ class ConsoleWrite(id: UUID, val text: String = "console.write") :
     var elem: Block? = null
 }
 
+
 @Composable
 fun BlockPanel(onBlockClick: (Block) -> Unit) {
     val blocks = listOf(
@@ -114,7 +108,8 @@ fun BlockPanel(onBlockClick: (Block) -> Unit) {
         IfElse(UUID.randomUUID()),
         While(UUID.randomUUID()),
         ConsoleRead(UUID.randomUUID()) ,
-        ConsoleWrite(UUID.randomUUID())
+        ConsoleWrite(UUID.randomUUID()),
+
     )
     Column(
         modifier = Modifier
@@ -122,7 +117,7 @@ fun BlockPanel(onBlockClick: (Block) -> Unit) {
             .navigationBarsPadding()
             .statusBarsPadding()
             .verticalScroll(rememberScrollState())
-            .padding(8.dp),
+            .padding(10.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         val onRow = mutableListOf<Block>()
@@ -144,7 +139,7 @@ fun BlockPanel(onBlockClick: (Block) -> Unit) {
                 {
                     Box(
                         modifier = Modifier
-                            .padding(vertical = 4.dp)
+                            .padding(vertical = 12.dp)
                             .background(block.color, RoundedCornerShape(8.dp))
                             .clickable { onBlockClick(onRow[1]) }
                     ) {
@@ -152,7 +147,7 @@ fun BlockPanel(onBlockClick: (Block) -> Unit) {
 
                             block = onRow[1],
                             onInputChange = {},
-                            isEditable = false,
+
                             isInteractive = false
                         )
                     }
@@ -162,14 +157,13 @@ fun BlockPanel(onBlockClick: (Block) -> Unit) {
                     )
                     Box(
                         modifier = Modifier
-                            .padding(vertical = 4.dp)
+                            .padding(vertical = 16.dp)
                             .background(block.color, RoundedCornerShape(8.dp))
                             .clickable { onBlockClick(onRow[0]) }
                     ) {
                         BlockView(
                             block = onRow[0],
                             onInputChange = {},
-                            isEditable = false,
                             isInteractive = false
                         )
                     }
@@ -179,18 +173,18 @@ fun BlockPanel(onBlockClick: (Block) -> Unit) {
             if (block !is Const && block !is Variable) {
                 Box(
                     modifier = Modifier
-                        .padding(vertical = 4.dp)
-                        .background(block.color, RoundedCornerShape(8.dp))
+                        .padding(vertical = 12.dp)
                         .clickable { onBlockClick(block) }
                 ) {
                     BlockView(
                         block = block,
                         onInputChange = {},
-                        isEditable = false,
                         isInteractive = false
                     )
                 }
             }
         }
     }
+
 }
+
