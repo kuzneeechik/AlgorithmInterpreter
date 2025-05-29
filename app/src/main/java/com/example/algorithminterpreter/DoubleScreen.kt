@@ -18,6 +18,9 @@ import androidx.compose.ui.unit.sp
 import com.example.algorithminterpreter.ui.theme.AlgorithmInterpreterTheme
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+
 data class PositionedBlock(
     val block: Block,
     var position: Offset,
@@ -27,12 +30,13 @@ data class PositionedBlock(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProjectScreen() {
+    val consoleOutput = remember { mutableStateListOf<String>() }
     var blocksVisible by remember { mutableStateOf(false) }
     var consoleVisible by remember { mutableStateOf(false) }
     val checkConsoleBord by animateDpAsState(
         targetValue = if (consoleVisible) (-298).dp else (0).dp //открывание закрывание консоли
     )
-    var workspaceBlocks = remember { mutableStateListOf<PositionedBlock>()} //изм блоков
+    val workspaceBlocks = remember { mutableStateListOf<PositionedBlock>()} //изм блоков
     var consoleInputText by remember { mutableStateOf("") } //сохранение текста введенного в консоль
 
     val check by animateDpAsState(
@@ -41,8 +45,27 @@ fun ProjectScreen() {
     val checkButton by animateDpAsState(
         targetValue = if (blocksVisible) 300.dp else 0.dp
     )
-        // открыта закрыта панель блоков
+    // открыта закрыта панель блоков
 
+    fun output(text: String) {
+        consoleOutput.add(text)
+    }
+
+    fun startInterpreter() {
+        try {
+            val code = "int x x = 5 while x > 0 console.write x x = x - 1 endwhile"
+
+
+            val lexer = Lexer(code)
+            lexer.lexAnalysis()
+
+            val parser = Parser(lexer.tokens, ::output)
+            val rootNode = parser.parseCode()
+            parser.run(rootNode)
+        } catch (e: Exception) {
+            output("Error occurred: ${e.message}")
+        }
+    }
 
     fun addBlockInOrder(block: Block) {
         val baseX = 400f
@@ -111,7 +134,7 @@ fun ProjectScreen() {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Button(
-                    onClick = {   },
+                    onClick = { startInterpreter() },
                     modifier = Modifier
                         .padding(start = 16.dp)
                         .height(55.dp)
@@ -255,8 +278,24 @@ fun ProjectScreen() {
                         cursorColor = Color.White
                     )
                 )
+
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 70.dp, start = 8.dp, end = 8.dp, bottom = 10.dp)
+                ) {
+                    items(consoleOutput) { line ->
+                        Text(
+                            text = line,
+                            fontSize = 18.sp,
+                            color = Color.White,
+                            modifier = Modifier.padding(vertical = 2.dp)
+                        )
+                    }
+                }
             }
         }
+
 
         if (consoleVisible )
         {

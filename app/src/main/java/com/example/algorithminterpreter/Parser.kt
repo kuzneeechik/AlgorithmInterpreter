@@ -1,9 +1,7 @@
 package com.example.algorithminterpreter
 import com.example.algorithminterpreter.ast.*
 
-class BreakException : RuntimeException()
-class ContinueException : RuntimeException()
-class Parser(private val tokens: List<Token>)
+class Parser(private val tokens: List<Token>, private val output: (String) -> Unit)
 {
     private var pos: Int = 0
     private var scope = mutableMapOf<String, Any>()
@@ -238,18 +236,6 @@ class Parser(private val tokens: List<Token>)
                 val whileNode = parseWhile()
                 return whileNode
             }
-
-            else if (match(tokenTypeList.find { it.name == "BREAK" }!!) != null)
-            {
-                val breakNode = BreakNode()
-                return breakNode
-            }
-
-            else if (match(tokenTypeList.find { it.name == "CONTINUE" }!!) != null)
-            {
-                val continueNode = ContinueNode()
-                return continueNode
-            }
         }
 
         pos -= 1
@@ -427,8 +413,8 @@ class Parser(private val tokens: List<Token>)
                 when (node.operator.type.name)
                 {
                     "WRITE" -> {
-                        print(run(node.operand))
-                        print(' ')
+                        val result = run(node.operand).toString()
+                        output(result)
                     }
                     "READ" -> {
                         val value = readln().toLongOrNull() ?: throw Error("Incorrect input")
@@ -525,13 +511,7 @@ class Parser(private val tokens: List<Token>)
 
                     if (conditionResult is Boolean && conditionResult)
                     {
-                        try {
-                            run(node.body)
-                        } catch (e: BreakException) {
-                            break
-                        } catch (e: ContinueException) {
-                            continue
-                        }
+                        run(node.body)
                     }
                     else
                     {
@@ -539,10 +519,6 @@ class Parser(private val tokens: List<Token>)
                     }
                 }
             }
-
-            is BreakNode -> throw BreakException()
-
-            is ContinueNode -> throw ContinueException()
 
             else -> println("Error!")
         }
