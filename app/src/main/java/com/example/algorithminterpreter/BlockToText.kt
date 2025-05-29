@@ -13,7 +13,7 @@ class BlockToText {
 
             is IntArray -> return "int ${block.variable}[${block.size}] "
 
-            is ArithmeticOperation -> return "${block.operator} "
+            is ArithmeticOperation -> return "${block.text} "
 
             is Staples -> {
                 val elem = block.elem.joinToString(" ") { convertBlockToText(it) }
@@ -25,7 +25,7 @@ class BlockToText {
                 val left = block.left.joinToString(" ") { convertBlockToText(it) }
                 val right = block.right.joinToString(" ") { convertBlockToText(it) }
 
-                return "$left ${block.operator} $right "
+                return "$left ${block.text} $right "
             }
 
             is Assignment -> {

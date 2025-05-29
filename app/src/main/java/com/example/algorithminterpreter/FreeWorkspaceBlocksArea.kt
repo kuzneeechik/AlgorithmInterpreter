@@ -1,19 +1,6 @@
 package com.example.algorithminterpreter
 
-import Block
-import BlueInt
-import BlueIntArray
-import ConsoleRead
-import ConsoleWrite
-import Const
-import GreenAssignment
-import If
-import IfElse
-import Operation
 import ScratchBlockShape
-import Staples
-import Variable
-import While
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -34,6 +21,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,13 +34,13 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import СomparisonOperation
 import kotlin.math.roundToInt
 
 private fun Char.isEnglishLetter(): Boolean {
@@ -61,7 +49,6 @@ private fun Char.isEnglishLetter(): Boolean {
 
 @Composable
 fun FreeWorkspaceBlocksArea(
-
     blocks: MutableList<PositionedBlock>,
     onWorkspaceClick: (Offset) -> Unit,
     onBlockMove: (Int, Offset) -> Unit,
@@ -196,7 +183,7 @@ fun BlockView(
             }
 
         }
-        is Operation -> {
+        is ArithmeticOperation -> {
 
             Box(
                 modifier = Modifier
@@ -232,7 +219,7 @@ fun BlockView(
             }
         }
 
-        is СomparisonOperation -> {
+        is ComparisonOperation -> {
             val parts = inputValue.split("|", limit = 2)
             val left = parts.getOrNull(0) ?: ""
             val right = parts.getOrNull(1) ?: ""
@@ -326,7 +313,7 @@ fun BlockView(
                 }
             }
         }
-        is BlueInt -> {
+        is IntVariable -> {
             Box(
                 modifier = Modifier
                     .background( shape = ScratchBlockShape(), color = Color(0xFF35C1FE))
@@ -356,7 +343,7 @@ fun BlockView(
 
         }
 
-        is BlueIntArray -> {
+        is IntArray -> {
             Box(
                 modifier = Modifier
                     .width(120.dp)
@@ -384,7 +371,7 @@ fun BlockView(
                             .height(40.dp),
                         singleLine = true,
                         enabled = isInteractive,
-                        colors = androidx.compose.material3.TextFieldDefaults.outlinedTextFieldColors(
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
                             containerColor = Color(0xFF35C1FE),
                             focusedBorderColor = Color.White,
                             unfocusedBorderColor = Color.White,
@@ -399,7 +386,7 @@ fun BlockView(
                 }
             }
         }
-        is GreenAssignment -> {
+        is Assignment -> {
             Box(
                 modifier = Modifier
                     .width(120.dp)
@@ -427,7 +414,7 @@ fun BlockView(
                             .height(40.dp),
                         singleLine = true,
                         enabled = isInteractive,
-                        colors = androidx.compose.material3.TextFieldDefaults.outlinedTextFieldColors(
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
                             containerColor = Color(0xFF35C1FE),
                             focusedBorderColor = Color.White,
                             unfocusedBorderColor = Color.White,
@@ -485,7 +472,7 @@ fun BlockView(
                             .height(36.dp),
                         singleLine = true,
                         enabled = isInteractive,
-                        colors = androidx.compose.material3.TextFieldDefaults.outlinedTextFieldColors(
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
                             containerColor = Color.Transparent,
                             focusedBorderColor = Color.White,
                             unfocusedBorderColor = Color.White,
@@ -543,7 +530,7 @@ fun BlockView(
                             .height(36.dp),
                         singleLine = true,
                         enabled = isInteractive,
-                        colors = androidx.compose.material3.TextFieldDefaults.outlinedTextFieldColors(
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
                             containerColor = Color.Transparent,
                             focusedBorderColor = Color.White,
                             unfocusedBorderColor = Color.White,
@@ -601,7 +588,7 @@ fun BlockView(
                             .height(36.dp),
                         singleLine = true,
                         enabled = isInteractive,
-                        colors = androidx.compose.material3.TextFieldDefaults.outlinedTextFieldColors(
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
                             containerColor = Color.Transparent,
                             focusedBorderColor = Color.White,
                             unfocusedBorderColor = Color.White,
@@ -640,11 +627,11 @@ fun BlockView(
                             .align(Alignment.Center),
                         singleLine = true,
                         enabled = isInteractive,
-                        textStyle = androidx.compose.ui.text.TextStyle(
+                        textStyle = TextStyle(
                             fontSize = 25.sp,
                             color = Color(0xFFD0D0D0),
                             fontWeight = FontWeight.Normal,
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                            textAlign = TextAlign.Center
                         ),
                         placeholder = {
                             Text(
@@ -652,11 +639,11 @@ fun BlockView(
                                 color = Color(0xFFD0D0D0),
                                 fontSize = 25.sp,
                                 fontWeight = FontWeight.Normal,
-                                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                                textAlign = TextAlign.Center,
                                 modifier = Modifier.fillMaxWidth()
                             )
                         },
-                        colors = androidx.compose.material3.TextFieldDefaults.outlinedTextFieldColors(
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
                             containerColor = Color.Transparent,
                             focusedBorderColor = Color.Transparent,
                             unfocusedBorderColor = Color.Transparent,
@@ -691,11 +678,11 @@ fun BlockView(
 
                     singleLine = true,
                     enabled = isInteractive,
-                    textStyle = androidx.compose.ui.text.TextStyle(
+                    textStyle = TextStyle(
                         fontSize = 18.sp,
                         color = Color(0xFFFFFFFF),
                         fontWeight = FontWeight.Normal,
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                        textAlign = TextAlign.Center
                     ),
                     placeholder = {
                         Text(
@@ -703,11 +690,11 @@ fun BlockView(
                             color = Color(0xFFD0D0D0),
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Normal,
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                            textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth()
                         )
                     },
-                    colors = androidx.compose.material3.TextFieldDefaults.outlinedTextFieldColors(
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
                         containerColor = Color.Transparent,
                         focusedBorderColor = Color.Transparent,
                         unfocusedBorderColor = Color.Transparent,

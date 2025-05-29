@@ -39,7 +39,8 @@ class ArrayElem(id: UUID) : Block(id, Color(0xFF35C1FE)) {
 class IntVariable(id: UUID) : Block(id, Color(0xFF35C1FE)) {
     var variable: String = ""
 }
-class IntArray(id: UUID) : Block(id, Color(0xFF35C1FE)) {
+class IntArray(id: UUID, val text: String = "int[]") :
+    Block(id, Color(0xFF35C1FE)) {
     var variable: String = ""
     var size: String = ""
 }
@@ -48,16 +49,17 @@ class Staples(id: UUID) : Block(id, Color(0xFFBA68C8)) {
     var elem: List<Block> = emptyList()
 }
 
-class ArithmeticOperation(id: UUID, val operator: String) :
+class ArithmeticOperation(id: UUID, val text: String) :
     Block(id, Color(0xFF2F860D))
 
-class ComparisonOperation(id: UUID, val operator: String) :
+class ComparisonOperation(id: UUID, val text: String) :
     Block(id, Color(0xFFF89402)) {
     var left: List<Block> = emptyList()
     var right: List<Block> = emptyList()
     }
 
-class Assignment(id: UUID) : Block(id, Color(0xFF71C94F)) {
+class Assignment(id: UUID, val text: String = "x =") :
+    Block(id, Color(0xFF71C94F)) {
     var variable: Variable? = null
     var value: List<Block> = emptyList()
 }
@@ -78,11 +80,13 @@ class While(id: UUID) : Block(id, Color(0xFFFF5755)) {
     var body: List<Block> = emptyList()
 }
 
-class ConsoleRead(id: UUID) : Block(id, Color(0xFF9A66FF)) {
+class ConsoleRead(id: UUID, val text: String = "console.read") :
+    Block(id, Color(0xFF9A66FF)) {
     var elem: Block? = null
 }
 
-class ConsoleWrite(id: UUID) : Block(id, Color(0xFF9A66FF)) {
+class ConsoleWrite(id: UUID, val text: String = "console.write") :
+    Block(id, Color(0xFF9A66FF)) {
     var elem: Block? = null
 }
 
