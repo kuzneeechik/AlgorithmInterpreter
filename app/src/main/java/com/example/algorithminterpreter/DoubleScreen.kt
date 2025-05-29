@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.sp
 import com.example.algorithminterpreter.ui.theme.AlgorithmInterpreterTheme
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.ui.geometry.Offset
+
 data class PositionedBlock(
     val block: Block,
     var position: Offset,
@@ -34,7 +35,7 @@ fun ProjectScreen() {
     val checkConsoleBord by animateDpAsState(
         targetValue = if (consoleVisible) (-298).dp else (0).dp
     )
-    var workspaceBlocks = remember { mutableStateListOf<PositionedBlock>()}
+    val workspaceBlocks = remember { mutableStateListOf<PositionedBlock>()}
     var consoleInputText by remember { mutableStateOf("") }
 
     val check by animateDpAsState(

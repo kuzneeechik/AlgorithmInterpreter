@@ -1,3 +1,5 @@
+package com.example.algorithminterpreter
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -19,7 +21,6 @@ import androidx.compose.ui.unit.sp
 import com.example.algorithminterpreter.BlockView
 import java.util.UUID
 
-
 open class Block(val id: UUID, val color: Color)
 
 class Const(id: UUID) : Block(id, Color(0xFF057CDE)) {
@@ -35,24 +36,34 @@ class ArrayElem(id: UUID) : Block(id, Color(0xFF35C1FE)) {
     var index: String = ""
 }
 
+class IntVariable(id: UUID) : Block(id, Color(0xFF35C1FE)) {
+    var variable: String = ""
+}
+class IntArray(id: UUID) : Block(id, Color(0xFF35C1FE)) {
+    var variable: String = ""
+    var size: String = ""
+}
+
+class Staples(id: UUID) : Block(id, Color(0xFFBA68C8)) {
+    var elem: List<Block> = emptyList()
+}
+
 class ArithmeticOperation(id: UUID, val operator: String) :
-    Block(id, Color(0xFF2F860D)) {
-    var right: Block? = null
-    }
+    Block(id, Color(0xFF2F860D))
 
 class ComparisonOperation(id: UUID, val operator: String) :
     Block(id, Color(0xFFF89402)) {
-    var left: Block? = null
-    var right: Block? = null
+    var left: List<Block> = emptyList()
+    var right: List<Block> = emptyList()
     }
 
 class Assignment(id: UUID) : Block(id, Color(0xFF71C94F)) {
     var variable: Variable? = null
-    var value: Block? = null
+    var value: List<Block> = emptyList()
 }
 
 class If(id: UUID) : Block(id, Color(0xFFFFAD19)) {
-    var condition: Block? = null
+    var condition: List<Block> = emptyList()
     var body: List<Block> = emptyList()
 }
 
@@ -73,18 +84,6 @@ class ConsoleRead(id: UUID) : Block(id, Color(0xFF9A66FF)) {
 
 class ConsoleWrite(id: UUID) : Block(id, Color(0xFF9A66FF)) {
     var elem: Block? = null
-}
-
-class Staples(id: UUID) : Block(id, Color(0xFFBA68C8)) {
-    var elem: List<Block> = emptyList()
-}
-
-class IntVariable(id: UUID) : Block(id, Color(0xFF35C1FE)) {
-    var variable: String = ""
-}
-class IntArray(id: UUID) : Block(id, Color(0xFF35C1FE)) {
-    var variable: String = ""
-    var size: String = ""
 }
 
 @Composable
