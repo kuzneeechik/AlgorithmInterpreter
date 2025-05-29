@@ -509,8 +509,18 @@ class Parser(private val tokens: List<Token>, private val output: (String) -> Un
             }
 
             is WhileNode -> {
+                val maxIterations = 10_000
+                var counter = 0
+
                 while (true)
                 {
+                    counter++
+
+                    if (counter > maxIterations)
+                    {
+                        throw Exception("An infinite loop has been started")
+                    }
+
                     val conditionResult = run(node.condition)
 
                     if (conditionResult is Boolean && conditionResult)

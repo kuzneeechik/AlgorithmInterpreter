@@ -54,7 +54,7 @@ fun ProjectScreen() {
 
     fun startInterpreter() {
         try {
-            val code = "int x x = (5 + 4 console.write y"
+            val code = "int x x = 5 while x > 0 console.write x endwhile"
 
             val lexer = Lexer(code)
             lexer.lexAnalysis()
