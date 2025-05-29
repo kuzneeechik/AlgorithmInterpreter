@@ -32,10 +32,10 @@ fun ProjectScreen() {
     var blocksVisible by remember { mutableStateOf(false) }
     var consoleVisible by remember { mutableStateOf(false) }
     val checkConsoleBord by animateDpAsState(
-        targetValue = if (consoleVisible) (-298).dp else (0).dp
+        targetValue = if (consoleVisible) (-298).dp else (0).dp //открывание закрывание консоли
     )
-    var workspaceBlocks = remember { mutableStateListOf<PositionedBlock>()}
-    var consoleInputText by remember { mutableStateOf("") }
+    var workspaceBlocks = remember { mutableStateListOf<PositionedBlock>()} //изм блоков
+    var consoleInputText by remember { mutableStateOf("") } //сохранение текста введенного в консоль
 
     val check by animateDpAsState(
         targetValue = if (blocksVisible) 0.dp else (-300).dp
@@ -43,13 +43,13 @@ fun ProjectScreen() {
     val checkButton by animateDpAsState(
         targetValue = if (blocksVisible) 300.dp else 0.dp
     )
-
+        // открыта закрыта панель блоков
 
 
     fun addBlockInOrder(block: Block) {
         val baseX = 400f
-        val arrayBlocks = workspaceBlocks.size+1
-        workspaceBlocks.add(PositionedBlock(block, Offset(baseX, 250f* arrayBlocks), ""))
+        val arrayBlocks = workspaceBlocks.size+ 1
+        workspaceBlocks.add(PositionedBlock(block, Offset(baseX, 100f* arrayBlocks), ""))
 
     }
 
@@ -64,7 +64,7 @@ fun ProjectScreen() {
             blocks = workspaceBlocks,
             selectedBlock = null,
             onWorkspaceClick = {},
-            onBlockMove = { index, offset ->
+            onBlockMove = { index, offset -> //обновляет позицию блока в списке при перетаскивании
                 val old = workspaceBlocks[index]
                 workspaceBlocks[index] = old.copy(position = old.position + offset)
             }
@@ -78,7 +78,10 @@ fun ProjectScreen() {
                 .padding(top = 150.dp)
                 .width(35.dp)
                 .height(150.dp)
-                .clickable { if (!consoleVisible) blocksVisible = !blocksVisible }
+                .clickable { if (!consoleVisible)
+                {
+                    blocksVisible = !blocksVisible
+                } }
         )
 
         Row(
@@ -93,7 +96,7 @@ fun ProjectScreen() {
 
         Box(
             modifier = Modifier
-                .offset(y = checkConsoleBord)
+                .offset(y = checkConsoleBord) //по у меняется открытие закрытие
                 .align(Alignment.BottomCenter)
                 .background(Color(0xFF5F52F0))
                 .navigationBarsPadding()
@@ -110,7 +113,7 @@ fun ProjectScreen() {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Button(
-                    onClick = {},
+                    onClick = {   },
                     modifier = Modifier
                         .padding(start = 16.dp)
                         .height(55.dp)
@@ -148,7 +151,6 @@ fun ProjectScreen() {
                 Button(
                     onClick = {
                         workspaceBlocks.clear()
-
                     },
                     modifier = Modifier
                         .padding(end = 16.dp)
@@ -232,7 +234,7 @@ fun ProjectScreen() {
             ) {
                 TextField(
                     value = consoleInputText,
-                    onValueChange = { consoleInputText = it },
+                    onValueChange = { consoleInputText = it }, //oбновляет текст консоли
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 8.dp, vertical = 10.dp)
@@ -240,7 +242,6 @@ fun ProjectScreen() {
                     placeholder = { Text("Введите текст:", fontSize = 22.sp,
                         color = Color.White,letterSpacing = 2.sp) },
                     textStyle = androidx.compose.ui.text.TextStyle(
-
                         fontSize = 22.sp,
                         color = Color.White,
                         textAlign = androidx.compose.ui.text.style.TextAlign.Start,

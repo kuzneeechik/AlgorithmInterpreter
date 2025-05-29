@@ -6,16 +6,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.algorithminterpreter.BlockView
 import java.util.UUID
 
@@ -107,7 +101,15 @@ class Variable(id: UUID, ) :
         return Variable(UUID.randomUUID())
     }
 }
+class ArraY(id: UUID, ) :
+    Block(id = id, text = "[ ]", color = Color(0xFF35C1FE)) {
+    var valueInput: String = ""
+    //сюда нужно  писать функцию связывания вашей части
 
+    fun createId(): Block {
+        return ArraY(UUID.randomUUID())
+    }
+}
 class IfElse(id: UUID, ) :
     Block(id = id, text = "ifElsee", color = Color(0xFFFFAD19)) {
     var valueInput: String = ""
@@ -125,6 +127,7 @@ class BlueInt(id: UUID, ) :
         return BlueInt(UUID.randomUUID())
     }
 }
+
 class BlueIntArray(id: UUID, ) :
     Block(id = id, text = "int[]", color = Color(0xFF35C1FE)) {
     var valueInput: String = ""
@@ -134,6 +137,7 @@ class BlueIntArray(id: UUID, ) :
         return BlueIntArray(UUID.randomUUID())
     }
 }
+
 class GreenAssignment(id: UUID, ) :
     Block(id = id, text = "X=", color = Color(0xFF71C94F)) {
     var valueInput: String = ""
@@ -148,8 +152,9 @@ fun BlockPanel(onBlockClick: (Block) -> Unit) {
     val blocks = listOf(
         Variable(UUID.randomUUID()),
         Const(UUID.randomUUID()),
+        ArraY(UUID.randomUUID()),
         Operation(UUID.randomUUID(), "+"),
-        Operation(UUID.randomUUID(), "-"),
+        Operation(UUID.randomUUID(), "—"),
         Operation(UUID.randomUUID(), "*"),
         Operation(UUID.randomUUID(), "/"),
         Operation(UUID.randomUUID(), "%"),
@@ -174,15 +179,15 @@ fun BlockPanel(onBlockClick: (Block) -> Unit) {
             .fillMaxSize()
             .navigationBarsPadding()
             .statusBarsPadding()
-            .verticalScroll(rememberScrollState())
-            .padding(10.dp),
+            .verticalScroll(rememberScrollState()) //скрол
+            .padding(bottom = 35.dp, top = 25.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         val onRow = mutableListOf<Block>()
         blocks.forEach { block ->
-            if ( block is Const ||  block is Variable)
+            if ( block is Const ||  block is Variable ||  block is ArraY )
             {
-                onRow.add(block)
+                onRow.add(block) //содержутся только блоки из списка
             }
         }
         var flag = true
@@ -190,46 +195,57 @@ fun BlockPanel(onBlockClick: (Block) -> Unit) {
 
             if(flag) {
                 flag = false
-                Row(
+                Row( //для размещения в строку
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 )
                 {
                     Box(
                         modifier = Modifier
-                            .padding(vertical = 12.dp)
                             .background(block.color, RoundedCornerShape(8.dp))
                             .clickable { onBlockClick(onRow[1]) }
                     ) {
-                        BlockView(
+                        BlockView( //длч отображения
 
                             block = onRow[1],
                             onInputChange = {},
-                            isEditable = false,
-                            isInteractive = false
+                            isInteractive = false //это чтоб в панели открывшейся нельзя было ввести текст
                         )
                     }
                     Spacer(
                         modifier = Modifier
-                            .width(8.dp)
+                            .width(10.dp)
                     )
                     Box(
                         modifier = Modifier
-                            .padding(vertical = 16.dp)
                             .background(block.color, RoundedCornerShape(8.dp))
                             .clickable { onBlockClick(onRow[0]) }
                     ) {
                         BlockView(
                             block = onRow[0],
                             onInputChange = {},
-                            isEditable = false,
+                            isInteractive = false
+                        )
+                    }
+                    Spacer(
+                        modifier = Modifier
+                            .width(10.dp)
+                    )
+                    Box(
+                        modifier = Modifier
+                            .background(block.color, RoundedCornerShape(8.dp))
+                            .clickable { onBlockClick(onRow[2]) }
+                    ) {
+                        BlockView(
+                            block = onRow[2],
+                            onInputChange = {},
                             isInteractive = false
                         )
                     }
                 }
             }
 
-            if (block !is Const && block !is Variable) {
+            if (block !is Const && block !is Variable && block !is ArraY) { //изменения ко всем остальным
                 Box(
                     modifier = Modifier
                         .padding(vertical = 12.dp)
@@ -238,7 +254,6 @@ fun BlockPanel(onBlockClick: (Block) -> Unit) {
                     BlockView(
                         block = block,
                         onInputChange = {},
-                        isEditable = false,
                         isInteractive = false
                     )
                 }

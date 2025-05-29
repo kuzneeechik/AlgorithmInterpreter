@@ -5,10 +5,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.*
 import com.example.algorithminterpreter.ui.theme.AlgorithmInterpreterTheme
 
@@ -32,8 +30,6 @@ class MainActivity : ComponentActivity() {
                             onNewProject = {
                                 navController.navigate("project")
                             },
-                            onMyProjects = {},
-                            onAbout = {}
                         )
                     }
                     composable("project") {

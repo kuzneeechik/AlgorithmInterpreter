@@ -21,18 +21,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.algorithminterpreter.R
 import com.example.algorithminterpreter.TomorrowFont
-import com.example.algorithminterpreter.ui.theme.AlgorithmInterpreterTheme
 
 @Composable
 fun StartScreen(
     onNewProject: () -> Unit,
-    onMyProjects: () -> Unit,
-    onAbout: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier
