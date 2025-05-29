@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
@@ -39,6 +40,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,6 +49,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
@@ -64,15 +67,15 @@ private fun Char.isEnglishLetter(): Boolean {
 fun FreeWorkspaceBlocksArea(
     blocks: MutableList<PositionedBlock>,
     onWorkspaceClick: (Offset) -> Unit,
-    onBlockMove: (Int, Offset) -> Unit,
+    onBlockMove: (Int, Offset) -> Unit, //принимает индекс блока и смещение
     selectedBlock: Block?,
     leftPanelWidth: Dp = 140.dp,
     topBoundaryDp: Dp = 90.dp,
-    bottomBoundaryDp: Dp = 190.dp,
+    bottomBoundaryDp: Dp = 170.dp,
     blockWidth: Dp = 270.dp
 ) {
-    var draggingIndex by remember { mutableStateOf<Int?>(null) }
-    var dragOffset by remember { mutableStateOf(Offset.Zero) }
+    var draggingIndex by remember { mutableStateOf<Int?>(null) } //индекс блока кот сейчас перетаскивается
+    var dragOffset by remember { mutableStateOf(Offset.Zero) } //смещение от начальной
     val density = LocalDensity.current
     val configuration = LocalConfiguration.current
     val screenHeightPx = with(density) { configuration.screenHeightDp.dp.toPx() }
@@ -85,7 +88,6 @@ fun FreeWorkspaceBlocksArea(
     Box(
         Modifier
             .fillMaxSize()
-            .background(Color(0xFFD6EAF8), RoundedCornerShape(12.dp))
             .pointerInput(selectedBlock) {
                 detectTapGestures { offset ->
                     if (selectedBlock != null) {
@@ -95,24 +97,26 @@ fun FreeWorkspaceBlocksArea(
             }
     ) {
         blocks.forEachIndexed { index, positionedBlock ->
-            val isDragging = draggingIndex == index
+            val isDragging = draggingIndex == index//перетаскивается или нет
+            val basePosition = positionedBlock.position //позиция без смещенияч текущая
+            val draggedPosition = if (isDragging)
+            {
+                basePosition + dragOffset
+            }
+            else
+            {
+                basePosition
+            }
+//это чтобы за границы не выходил
+            val constrainedPosition = Offset(
+                x = draggedPosition.x.coerceAtLeast(leftPanelWidthPx - halfBlockWidthPx),
+                y = draggedPosition.y.coerceIn(topBoundaryPx, screenHeightPx - bottomBoundaryPx)
+            )
+
             Box(
                 modifier = Modifier
-                    .zIndex(if (isDragging) 1f else 0f)
-                    .offset {
-                        val currentPosition = positionedBlock.position
-                        var newPosition = if (isDragging) currentPosition + dragOffset else currentPosition
 
-                        newPosition = newPosition.copy(
-                            x = newPosition.x.coerceAtLeast(leftPanelWidthPx - halfBlockWidthPx), // только левая граница
-                            y = newPosition.y.coerceIn(
-                                topBoundaryPx,
-                                screenHeightPx - bottomBoundaryPx
-                            )
-                        )
-
-                        IntOffset(newPosition.x.roundToInt(), newPosition.y.roundToInt())
-                    }
+                    .offset { IntOffset(constrainedPosition.x.roundToInt(), constrainedPosition.y.roundToInt()) }
                     .pointerInput(index) {
                         detectDragGestures(
                             onDragStart = {
@@ -124,17 +128,12 @@ fun FreeWorkspaceBlocksArea(
                             },
                             onDragEnd = {
                                 draggingIndex?.let { idx ->
-                                    var finalPosition = blocks[idx].position + dragOffset
-
-                                    finalPosition = finalPosition.copy(
+                                    val finalPosition = blocks[idx].position + dragOffset
+                                    val constrainedFinalPosition = Offset(
                                         x = finalPosition.x.coerceAtLeast(leftPanelWidthPx - halfBlockWidthPx),
-                                        y = finalPosition.y.coerceIn(
-                                            topBoundaryPx,
-                                            screenHeightPx - bottomBoundaryPx
-                                        )
+                                        y = finalPosition.y.coerceIn(topBoundaryPx, screenHeightPx - bottomBoundaryPx)
                                     )
-
-                                    onBlockMove(idx, finalPosition - blocks[idx].position)
+                                    onBlockMove(idx, constrainedFinalPosition - blocks[idx].position)
                                 }
                                 draggingIndex = null
                                 dragOffset = Offset.Zero
@@ -152,19 +151,18 @@ fun FreeWorkspaceBlocksArea(
             }
         }
     }
+
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BlockView(
     block: Block,
     inputValue: String = "",
-    isEditable: Boolean = true,
-    isSelected: Boolean = false,
     isInteractive: Boolean = true,
     onInputChange: (String) -> Unit = {},
 ) {
-    val borderWidth = if (isSelected) 4.dp else 2.dp
     val cornerRadius = 6.dp
     when (block) {
         is ConsoleRead -> {
@@ -256,9 +254,6 @@ fun BlockView(
         }
 
         is СomparisonOperation -> {
-            val parts = inputValue.split("|", limit = 2)
-            val left = parts.getOrNull(0) ?: ""
-            val right = parts.getOrNull(1) ?: ""
             val operator = when (block.text) {
                 ">" -> ">"
                 "<" -> "<"
@@ -306,9 +301,6 @@ fun BlockView(
         }
 
         is Staples -> {
-            val parts = inputValue.split("|", limit = 2)
-            val left = parts.getOrNull(0) ?: ""
-            val right = parts.getOrNull(1) ?: ""
             Box(
                 modifier = Modifier
                     .width(180.dp)
@@ -554,7 +546,6 @@ fun BlockView(
         }
 
         is Const -> {
-
                 Box(
                     modifier = Modifier
                         .width(55.dp)
@@ -576,11 +567,11 @@ fun BlockView(
                             .align(Alignment.Center),
                         singleLine = true,
                         enabled = isInteractive,
-                        textStyle = androidx.compose.ui.text.TextStyle(
+                        textStyle = TextStyle(
                             fontSize = 25.sp,
                             color = Color(0xFFD0D0D0),
                             fontWeight = FontWeight.Normal,
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                            textAlign = TextAlign.Center
                         ),
                         placeholder = {
                             Text(
@@ -588,11 +579,11 @@ fun BlockView(
                                 color = Color(0xFFD0D0D0),
                                 fontSize = 25.sp,
                                 fontWeight = FontWeight.Normal,
-                                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                                textAlign = TextAlign.Center,
                                 modifier = Modifier.fillMaxWidth()
                             )
                         },
-                        colors = androidx.compose.material3.TextFieldDefaults.outlinedTextFieldColors(
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
                             containerColor = Color.Transparent,
                             focusedBorderColor = Color.Transparent,
                             unfocusedBorderColor = Color.Transparent,
@@ -605,58 +596,70 @@ fun BlockView(
                     )
             }
         }
-        is ArraY -> {
+    is ArraY -> {
 
-            Box(
+        Box(
+            modifier = Modifier
+                .width(140.dp) // Ширина всего блока
+                .height(56.dp)
+                .background(Color(0xFF35C1FE), RoundedCornerShape(6.dp))
+                .border(2.dp, Color.White, RoundedCornerShape(6.dp))
+                .padding(horizontal = 12.dp) // Отступы от краёв рамки
+        ) {
+            // Левая скобка
+            Text(
+                text = "[",
+                color = Color.White,
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
                 modifier = Modifier
-                    .width(55.dp)
-                    .height(56.dp)
-                    .background(Color(0xFF35C1FE), RoundedCornerShape(6.dp))
-                    .border(2.dp, Color.White, RoundedCornerShape(6.dp)),
-                contentAlignment = Alignment.Center
-            ) {
-                OutlinedTextField(
-                    value = inputValue,
-                    onValueChange = { newValue ->
-                        if (newValue.isEmpty() || newValue.all { it.isDigit() }) {
-                            onInputChange(newValue)
+                    .align(Alignment.CenterStart) // Прижать к левому краю по центру вертикали
+                    .padding(start = 0.dp) // Можно подкорректировать отступ
+            )
 
-                        }
-                    },
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .align(Alignment.Center),
-                    singleLine = true,
-                    enabled = isInteractive,
-                    textStyle = androidx.compose.ui.text.TextStyle(
-                        fontSize = 18.sp,
-                        color = Color(0xFFFFFFFF),
-                        fontWeight = FontWeight.Normal,
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                    ),
-                    placeholder = {
-                        Text(
-                            text = "[ ]",
-                            color = Color(0xFFFFFFFF),
-                            fontSize = 25.sp,
-                            fontWeight = FontWeight.Normal,
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    },
-                    colors = androidx.compose.material3.TextFieldDefaults.outlinedTextFieldColors(
-                        containerColor = Color.Transparent,
-                        focusedBorderColor = Color.Transparent,
-                        unfocusedBorderColor = Color.Transparent,
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White,
-                        cursorColor = Color.White,
-                        disabledTextColor = Color.White,
-                        disabledBorderColor = Color.Transparent
-                    )
+            // Поле ввода
+            OutlinedTextField(
+                value = inputValue,
+                onValueChange = { newValue ->
+                    if (newValue.isEmpty() || newValue.all { it.isLetterOrDigit() }) {
+                        onInputChange(newValue)
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .padding(start = 28.dp, end = 28.dp) // Отступы слева и справа, чтобы не налезать на скобки
+                    .align(Alignment.Center), // Центрируем поле в Box
+                singleLine = true,
+                enabled = isInteractive,
+                textStyle = TextStyle(
+                    fontSize = 18.sp,
+                    color = Color.White,
+                    fontWeight = FontWeight.Normal,
+                    textAlign = TextAlign.Center
+                ),
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    containerColor = Color.Transparent,
+                    focusedBorderColor = Color.Transparent,
+                    unfocusedBorderColor = Color.Transparent,
+                    cursorColor = Color.White,
+                    disabledTextColor = Color.White,
+                    disabledBorderColor = Color.Transparent
                 )
-            }
+            )
+
+            // Правая скобка
+            Text(
+                text = "]",
+                color = Color.White,
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .align(Alignment.CenterEnd) // Прижать к правому краю по центру вертикали
+                    .padding(end = 0.dp)
+            )
         }
+
+    }
         is Variable -> {
             Box(
                 modifier = Modifier
@@ -668,7 +671,7 @@ fun BlockView(
                 OutlinedTextField(
                     value = inputValue,
                     onValueChange = { newValue ->
-                        //  только английские буквы
+
                         if (newValue.isEmpty() || newValue.all { it.isLetter() && it.isEnglishLetter() }) {
                             onInputChange(newValue)
                         }
@@ -679,11 +682,11 @@ fun BlockView(
 
                     singleLine = true,
                     enabled = isInteractive,
-                    textStyle = androidx.compose.ui.text.TextStyle(
+                    textStyle = TextStyle(
                         fontSize = 18.sp,
                         color = Color(0xFFFFFFFF),
                         fontWeight = FontWeight.Normal,
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                        textAlign = TextAlign.Center
                     ),
                     placeholder = {
                         Text(
@@ -691,11 +694,11 @@ fun BlockView(
                             color = Color(0xFFD0D0D0),
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Normal,
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                            textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth()
                         )
                     },
-                    colors = androidx.compose.material3.TextFieldDefaults.outlinedTextFieldColors(
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
                         containerColor = Color.Transparent,
                         focusedBorderColor = Color.Transparent,
                         unfocusedBorderColor = Color.Transparent,
