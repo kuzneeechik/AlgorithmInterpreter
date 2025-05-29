@@ -1,7 +1,5 @@
 package com.example.algorithminterpreter
 
-import Block
-import BlockPanel
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -234,7 +232,7 @@ fun ProjectScreen() {
             ) {
                 TextField(
                     value = consoleInputText,
-                    onValueChange = { consoleInputText = it }, //oбновляет текст консоли
+                    onValueChange = { consoleInputText = it },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 8.dp, vertical = 10.dp)
@@ -242,6 +240,7 @@ fun ProjectScreen() {
                     placeholder = { Text("Введите текст:", fontSize = 22.sp,
                         color = Color.White,letterSpacing = 2.sp) },
                     textStyle = androidx.compose.ui.text.TextStyle(
+
                         fontSize = 22.sp,
                         color = Color.White,
                         textAlign = androidx.compose.ui.text.style.TextAlign.Start,

@@ -1,26 +1,12 @@
 package com.example.algorithminterpreter
-import ArraY
-import Block
-import BlockIf
-import BlockIfElse
-import BlockWhile
-import BlueInt
-import BlueIntArray
-import ConsoleRead
-import ConsoleReadBlocks
-import ConsoleWrite
-import ConsoleWriteBlocks
-import Const
-import GreenAssignment
 import GreenAssignmentBlocks
-import If
-import IfElse
 import IntBlock
+import BlockIfElse
 import IntBlockArray
-import Operation
-import Staples
-import Variable
-import While
+import BlockIf
+
+import BlockWhile
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -29,7 +15,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
@@ -44,50 +29,40 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import СomparisonOperation
+
 import kotlin.math.roundToInt
 
 private fun Char.isEnglishLetter(): Boolean {
     return this in 'a'..'z' || this in 'A'..'Z'
 }
+
 @Composable
 fun FreeWorkspaceBlocksArea(
+
     blocks: MutableList<PositionedBlock>,
     onWorkspaceClick: (Offset) -> Unit,
-    onBlockMove: (Int, Offset) -> Unit, //принимает индекс блока и смещение
-    selectedBlock: Block?,
-    leftPanelWidth: Dp = 140.dp,
-    topBoundaryDp: Dp = 90.dp,
-    bottomBoundaryDp: Dp = 170.dp,
-    blockWidth: Dp = 270.dp
+    onBlockMove: (Int, Offset) -> Unit,
+    selectedBlock: Block?
 ) {
-    var draggingIndex by remember { mutableStateOf<Int?>(null) } //индекс блока кот сейчас перетаскивается
-    var dragOffset by remember { mutableStateOf(Offset.Zero) } //смещение от начальной
-    val density = LocalDensity.current
-    val configuration = LocalConfiguration.current
-    val screenHeightPx = with(density) { configuration.screenHeightDp.dp.toPx() }
-
-    val leftPanelWidthPx = with(density) { leftPanelWidth.toPx() }
-    val topBoundaryPx = with(density) { topBoundaryDp.toPx() }
-    val bottomBoundaryPx = with(density) { bottomBoundaryDp.toPx() }
-    val halfBlockWidthPx = with(density) { blockWidth.toPx() / 2 }
+    var draggingIndex by remember { mutableStateOf<Int?>(null) }
+    var dragOffset by remember { mutableStateOf(Offset.Zero) }
 
     Box(
         Modifier
             .fillMaxSize()
+            .background(Color(0xFFD6EAF8), RoundedCornerShape(12.dp))
             .pointerInput(selectedBlock) {
                 detectTapGestures { offset ->
                     if (selectedBlock != null) {
@@ -97,26 +72,14 @@ fun FreeWorkspaceBlocksArea(
             }
     ) {
         blocks.forEachIndexed { index, positionedBlock ->
-            val isDragging = draggingIndex == index//перетаскивается или нет
-            val basePosition = positionedBlock.position //позиция без смещенияч текущая
-            val draggedPosition = if (isDragging)
-            {
-                basePosition + dragOffset
-            }
-            else
-            {
-                basePosition
-            }
-//это чтобы за границы не выходил
-            val constrainedPosition = Offset(
-                x = draggedPosition.x.coerceAtLeast(leftPanelWidthPx - halfBlockWidthPx),
-                y = draggedPosition.y.coerceIn(topBoundaryPx, screenHeightPx - bottomBoundaryPx)
-            )
-
+            val isDragging = draggingIndex == index
             Box(
                 modifier = Modifier
-
-                    .offset { IntOffset(constrainedPosition.x.roundToInt(), constrainedPosition.y.roundToInt()) }
+                    .zIndex(if (isDragging) 1f else 0f)
+                    .offset {
+                        val pos = if (isDragging) positionedBlock.position + dragOffset else positionedBlock.position
+                        IntOffset(pos.x.roundToInt(), pos.y.roundToInt())
+                    }
                     .pointerInput(index) {
                         detectDragGestures(
                             onDragStart = {
@@ -127,13 +90,8 @@ fun FreeWorkspaceBlocksArea(
                                 dragOffset += dragAmount
                             },
                             onDragEnd = {
-                                draggingIndex?.let { idx ->
-                                    val finalPosition = blocks[idx].position + dragOffset
-                                    val constrainedFinalPosition = Offset(
-                                        x = finalPosition.x.coerceAtLeast(leftPanelWidthPx - halfBlockWidthPx),
-                                        y = finalPosition.y.coerceIn(topBoundaryPx, screenHeightPx - bottomBoundaryPx)
-                                    )
-                                    onBlockMove(idx, constrainedFinalPosition - blocks[idx].position)
+                                if (draggingIndex != null) {
+                                    onBlockMove(draggingIndex!!, dragOffset)
                                 }
                                 draggingIndex = null
                                 dragOffset = Offset.Zero
@@ -151,7 +109,6 @@ fun FreeWorkspaceBlocksArea(
             }
         }
     }
-
 }
 
 
@@ -160,69 +117,76 @@ fun FreeWorkspaceBlocksArea(
 fun BlockView(
     block: Block,
     inputValue: String = "",
+    isEditable: Boolean = true,
+    isSelected: Boolean = false,
     isInteractive: Boolean = true,
     onInputChange: (String) -> Unit = {},
 ) {
+    val borderWidth = if (isSelected) 4.dp else 2.dp
     val cornerRadius = 6.dp
     when (block) {
         is ConsoleRead -> {
-            Box(
-                modifier = Modifier
-                    .background(shape = ConsoleReadBlocks(), color = Color(0xFF9A66FF))
-                    .width(250.dp)
-                    .height(95.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(24.dp)
+                Box(
+                    modifier = Modifier
+                        .width(220.dp)
+                        .height(95.dp)
+                        .background(block.color, RoundedCornerShape(cornerRadius))
+                        .border(2.dp, Color.White, RoundedCornerShape(cornerRadius))
+                        .padding(8.dp)
                 ) {
-                    Text(
-                        text = "console.read",
-                        color = Color.White,
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Normal,
-                        textAlign = TextAlign.Start
-                    )
-                    Box(
-                        modifier = Modifier
-                            .width(56.dp)
-                            .height(57.dp)
-                            .border(2.dp, Color.White, RoundedCornerShape(8.dp))
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        Text(
+                            text = block.text,
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 22.sp
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Box(
+                            modifier = Modifier
+                                .width(56.dp)
+                                .height(57.dp)
+                                .border(2.dp, Color.White, RoundedCornerShape(8.dp))
+                        ) { }
+                    }
                 }
-            }
 
         }
         is ConsoleWrite -> {
             Box(
                 modifier = Modifier
-                    .background(shape = ConsoleWriteBlocks(), color = Color(0xFF9A66FF))
-                    .width(250.dp)
-                    .height(95.dp),
-                contentAlignment = Alignment.Center
+                    .width(220.dp)
+                    .height(95.dp)
+                    .background(block.color, RoundedCornerShape(cornerRadius))
+                    .border(2.dp, Color.White, RoundedCornerShape(cornerRadius))
+                    .padding(8.dp)
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(24.dp)
+                    modifier = Modifier.fillMaxSize()
                 ) {
                     Text(
-                        text = "console.write",
+                        text = block.text,
                         color = Color.White,
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Normal,
-                        textAlign = TextAlign.Start
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 22.sp
                     )
+                    Spacer(modifier = Modifier.width(4.dp))
                     Box(
                         modifier = Modifier
                             .width(56.dp)
                             .height(57.dp)
                             .border(2.dp, Color.White, RoundedCornerShape(8.dp))
-                    )
+                    ) { }
                 }
             }
+
         }
-        is Operation -> {
+        is ArithmeticOperation -> {
+
             Box(
                 modifier = Modifier
                     .width(55.dp)
@@ -247,13 +211,13 @@ fun BlockView(
                         fontSize = 27.sp,
                         modifier = Modifier
 
-
                     )
+
                 }
             }
         }
 
-        is СomparisonOperation -> {
+        is ComparisonOperation -> {
             val operator = when (block.text) {
                 ">" -> ">"
                 "<" -> "<"
@@ -301,6 +265,7 @@ fun BlockView(
         }
 
         is Staples -> {
+
             Box(
                 modifier = Modifier
                     .width(180.dp)
@@ -341,12 +306,12 @@ fun BlockView(
                 }
             }
         }
-        is BlueInt -> {
+        is IntVariable -> {
             Box(
                 modifier = Modifier
-                    .background(shape = IntBlock(), color = Color(0xFF35C1FE))
-                    .width(150.dp)
-                    .height(95.dp),
+                    .background( shape = IntBlock(), color = Color(0xFF35C1FE))
+                    .width(160.dp)
+                    .height(80.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Row(
@@ -371,7 +336,7 @@ fun BlockView(
 
         }
 
-        is BlueIntArray -> {
+        is IntArray -> {
             Box(
                 modifier = Modifier
                     .background(shape = IntBlockArray(), color = Color(0xFF35C1FE))
@@ -420,8 +385,7 @@ fun BlockView(
                 }
             }
         }
-
-        is GreenAssignment -> {
+        is Assignment -> {
             Box(
                 modifier = Modifier
                     .background(shape = GreenAssignmentBlocks(), color = Color(0xFF71C94F))
@@ -494,6 +458,7 @@ fun BlockView(
                     .height(95.dp),
                 contentAlignment = Alignment.Center
             ) {
+
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -546,6 +511,7 @@ fun BlockView(
         }
 
         is Const -> {
+
                 Box(
                     modifier = Modifier
                         .width(55.dp)
@@ -567,11 +533,11 @@ fun BlockView(
                             .align(Alignment.Center),
                         singleLine = true,
                         enabled = isInteractive,
-                        textStyle = TextStyle(
+                        textStyle = androidx.compose.ui.text.TextStyle(
                             fontSize = 25.sp,
                             color = Color(0xFFD0D0D0),
                             fontWeight = FontWeight.Normal,
-                            textAlign = TextAlign.Center
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
                         ),
                         placeholder = {
                             Text(
@@ -579,11 +545,11 @@ fun BlockView(
                                 color = Color(0xFFD0D0D0),
                                 fontSize = 25.sp,
                                 fontWeight = FontWeight.Normal,
-                                textAlign = TextAlign.Center,
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                                 modifier = Modifier.fillMaxWidth()
                             )
                         },
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                        colors = androidx.compose.material3.TextFieldDefaults.outlinedTextFieldColors(
                             containerColor = Color.Transparent,
                             focusedBorderColor = Color.Transparent,
                             unfocusedBorderColor = Color.Transparent,
