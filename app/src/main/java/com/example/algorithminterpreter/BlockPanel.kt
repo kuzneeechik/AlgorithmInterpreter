@@ -193,5 +193,4 @@ fun BlockPanel(onBlockClick: (Block) -> Unit) {
             }
         }
     }
-
 }
