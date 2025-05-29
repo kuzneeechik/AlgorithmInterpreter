@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
@@ -35,6 +36,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
@@ -562,70 +564,70 @@ fun BlockView(
                     )
             }
         }
-    is ArraY -> {
 
-        Box(
-            modifier = Modifier
-                .width(140.dp) // Ширина всего блока
-                .height(56.dp)
-                .background(Color(0xFF35C1FE), RoundedCornerShape(6.dp))
-                .border(2.dp, Color.White, RoundedCornerShape(6.dp))
-                .padding(horizontal = 12.dp) // Отступы от краёв рамки
-        ) {
-            // Левая скобка
-            Text(
-                text = "[",
-                color = Color.White,
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold,
+        is ArrayElem -> {
+            Box(
                 modifier = Modifier
-                    .align(Alignment.CenterStart) // Прижать к левому краю по центру вертикали
-                    .padding(start = 0.dp) // Можно подкорректировать отступ
-            )
-
-            // Поле ввода
-            OutlinedTextField(
-                value = inputValue,
-                onValueChange = { newValue ->
-                    if (newValue.isEmpty() || newValue.all { it.isLetterOrDigit() }) {
-                        onInputChange(newValue)
-                    }
-                },
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .padding(start = 28.dp, end = 28.dp) // Отступы слева и справа, чтобы не налезать на скобки
-                    .align(Alignment.Center), // Центрируем поле в Box
-                singleLine = true,
-                enabled = isInteractive,
-                textStyle = TextStyle(
-                    fontSize = 18.sp,
+                    .width(140.dp) // Ширина всего блока
+                    .height(56.dp)
+                    .background(Color(0xFF35C1FE), RoundedCornerShape(6.dp))
+                    .border(2.dp, Color.White, RoundedCornerShape(6.dp))
+                    .padding(horizontal = 12.dp) // Отступы от краёв рамки
+            ) {
+                // Левая скобка
+                Text(
+                    text = "[",
                     color = Color.White,
-                    fontWeight = FontWeight.Normal,
-                    textAlign = TextAlign.Center
-                ),
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    containerColor = Color.Transparent,
-                    focusedBorderColor = Color.Transparent,
-                    unfocusedBorderColor = Color.Transparent,
-                    cursorColor = Color.White,
-                    disabledTextColor = Color.White,
-                    disabledBorderColor = Color.Transparent
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .align(Alignment.CenterStart) // Прижать к левому краю по центру вертикали
+                        .padding(start = 0.dp) // Можно подкорректировать отступ
                 )
-            )
 
-            // Правая скобка
-            Text(
-                text = "]",
-                color = Color.White,
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier
-                    .align(Alignment.CenterEnd) // Прижать к правому краю по центру вертикали
-                    .padding(end = 0.dp)
-            )
+                // Поле ввода
+                OutlinedTextField(
+                    value = inputValue,
+                    onValueChange = { newValue ->
+                        if (newValue.isEmpty() || newValue.all { it.isLetterOrDigit() }) {
+                            onInputChange(newValue)
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .padding(start = 28.dp, end = 28.dp) // Отступы слева и справа, чтобы не налезать на скобки
+                        .align(Alignment.Center), // Центрируем поле в Box
+                    singleLine = true,
+                    enabled = isInteractive,
+                    textStyle = TextStyle(
+                        fontSize = 18.sp,
+                        color = Color.White,
+                        fontWeight = FontWeight.Normal,
+                        textAlign = TextAlign.Center
+                    ),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        containerColor = Color.Transparent,
+                        focusedBorderColor = Color.Transparent,
+                        unfocusedBorderColor = Color.Transparent,
+                        cursorColor = Color.White,
+                        disabledTextColor = Color.White,
+                        disabledBorderColor = Color.Transparent
+                    )
+                )
+
+                // Правая скобка
+                Text(
+                    text = "]",
+                    color = Color.White,
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd) // Прижать к правому краю по центру вертикали
+                        .padding(end = 0.dp)
+                )
+            }
         }
 
-    }
         is Variable -> {
             Box(
                 modifier = Modifier

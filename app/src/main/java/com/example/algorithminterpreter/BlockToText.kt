@@ -77,7 +77,7 @@ class BlockToText {
         }
     }
 
-    fun convertBlocksToProgram(blocks: List<Block>): String {
+    fun convertBlocksToCode(blocks: List<Block>): String {
         return blocks.joinToString { convertBlockToText(it) }
     }
 } 
