@@ -20,6 +20,7 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import java.lang.Exception
 
 data class PositionedBlock(
     val block: Block,
@@ -53,8 +54,7 @@ fun ProjectScreen() {
 
     fun startInterpreter() {
         try {
-            val code = "int x x = 5 while x > 0 console.write x x = x - 1 endwhile"
-
+            val code = "int x x = (5 + 4 console.write y"
 
             val lexer = Lexer(code)
             lexer.lexAnalysis()
@@ -62,8 +62,9 @@ fun ProjectScreen() {
             val parser = Parser(lexer.tokens, ::output)
             val rootNode = parser.parseCode()
             parser.run(rootNode)
-        } catch (e: Exception) {
-            output("Error occurred: ${e.message}")
+        }
+        catch (e: Exception) {
+            output("Error: ${e.message}")
         }
     }
 

@@ -1,10 +1,10 @@
 package com.example.algorithminterpreter
+
 import GreenAssignmentBlocks
 import IntBlock
 import BlockIfElse
 import IntBlockArray
 import BlockIf
-
 import BlockWhile
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
