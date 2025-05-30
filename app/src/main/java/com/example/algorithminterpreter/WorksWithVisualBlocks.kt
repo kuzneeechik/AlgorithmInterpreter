@@ -191,7 +191,6 @@ fun FreeWorkspaceBlocksArea(
         }
     }
 }
-
 @Composable
 fun BlockView(
     block: Block,
