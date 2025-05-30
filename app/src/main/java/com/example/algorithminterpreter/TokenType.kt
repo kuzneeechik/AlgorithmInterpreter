@@ -29,4 +29,5 @@ val tokenTypeList: MutableList<TokenType> = mutableListOf(
     TokenType("NUMBER", "^[0-9]+"),
     TokenType("WHILE", "^while"),
     TokenType("ENDWHILE", "^endwhile"),
-    TokenType("VARIABLE", "^[A-Za-z_][A-Za-z0-9_]*"))
+    TokenType("VARIABLE", "^[A-Za-z_][A-Za-z0-9_]*")
+)

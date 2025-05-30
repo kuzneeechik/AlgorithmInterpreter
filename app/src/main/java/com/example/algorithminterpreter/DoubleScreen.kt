@@ -59,7 +59,7 @@ fun ProjectScreen() {
     val checkConsoleBord by animateDpAsState(
         targetValue = if (consoleVisible) (-298).dp else (0).dp //открывание закрывание консоли
     )
-    var workspaceBlocks = remember { mutableStateListOf<PositionedBlock>()} //изм блоков
+    var workspaceBlocks = remember { mutableStateListOf<PositionedBlock>() } //изм блоков
     var consoleInputText by remember { mutableStateOf("") } //сохранение текста введенного в консоль
 
     val check by animateDpAsState(
@@ -133,8 +133,8 @@ fun ProjectScreen() {
 
     fun addBlockInOrder(block: Block) {
         val baseX = 400f
-        val arrayBlocks = workspaceBlocks.size+ 1
-        workspaceBlocks.add(PositionedBlock(block, Offset(baseX, 100f* arrayBlocks), ""))
+        val arrayBlocks = workspaceBlocks.size + 1
+        workspaceBlocks.add(PositionedBlock(block, Offset(baseX, 100f * arrayBlocks), ""))
 
     }
 
@@ -163,10 +163,11 @@ fun ProjectScreen() {
                 .padding(top = 150.dp)
                 .width(35.dp)
                 .height(150.dp)
-                .clickable { if (!consoleVisible)
-                {
-                    blocksVisible = !blocksVisible
-                } }
+                .clickable {
+                    if (!consoleVisible) {
+                        blocksVisible = !blocksVisible
+                    }
+                }
         )
 
         Row(
@@ -317,8 +318,11 @@ fun ProjectScreen() {
 
         var cursorVisible by remember { mutableStateOf(true) }
         val cursorAlpha by animateFloatAsState(
-            targetValue = if (cursorVisible) { 1f }
-            else {0f}, //(видим/невидим)
+            targetValue = if (cursorVisible) {
+                1f
+            } else {
+                0f
+            }, //(видим/невидим)
             animationSpec = infiniteRepeatable(
                 animation = tween(500),
                 repeatMode = RepeatMode.Reverse //это то что повтор
@@ -424,8 +428,7 @@ fun ProjectScreen() {
             }
         }
 
-        if (consoleVisible )
-        {
+        if (consoleVisible) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -435,8 +438,7 @@ fun ProjectScreen() {
             ) {}
         }
 
-        if (!consoleVisible && !blocksVisible)
-        {
+        if (!consoleVisible && !blocksVisible) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
