@@ -31,6 +31,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
+import com.example.algorithminterpreter.ui.theme.DarkPurple
+import com.example.algorithminterpreter.ui.theme.LightLightPurple
+import com.example.algorithminterpreter.ui.theme.LightPurple
+import com.example.algorithminterpreter.ui.theme.PurpleGrey
 import kotlinx.coroutines.delay
 
 data class PositionedBlock(
@@ -67,7 +71,8 @@ fun ProjectScreen() {
 
     var waitingForStartInput by remember { mutableStateOf(false) }
     val inputQueue = remember { mutableStateListOf<String>() }  // очередь введённых строк
-    val code = "int x console.read x console.write x x = x + 1 console.write x int y console.read y console.write y "
+    val code =
+        "int x console.read x console.write x x = x + 1 console.write x int y console.read y console.write y "
 
     fun output(text: String) {
         consoleOutput.add(text)
@@ -107,7 +112,7 @@ fun ProjectScreen() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFE0DDFF))
+            .background(LightLightPurple)
     ) {
 
         FreeWorkspaceBlocksArea(
@@ -141,7 +146,7 @@ fun ProjectScreen() {
                 .statusBarsPadding()
                 .height(40.dp)
                 .fillMaxWidth()
-                .background(color = Color(0xFF5F52F0)),
+                .background(color = DarkPurple),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {}
@@ -150,7 +155,7 @@ fun ProjectScreen() {
             modifier = Modifier
                 .offset(y = checkConsoleBord) //по у меняется открытие закрытие
                 .align(Alignment.BottomCenter)
-                .background(Color(0xFF5F52F0))
+                .background(DarkPurple)
                 .navigationBarsPadding()
                 .height(85.dp)
                 .fillMaxWidth()
@@ -159,7 +164,7 @@ fun ProjectScreen() {
             Row(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color(0xFF5F52F0))
+                    .background(DarkPurple)
                     .height(85.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
@@ -183,7 +188,7 @@ fun ProjectScreen() {
                         .height(55.dp)
                         .border(2.dp, Color.White, RoundedCornerShape(25.dp)),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF5F52F0),
+                        containerColor = DarkPurple,
                         contentColor = Color.White
                     ),
                     contentPadding = PaddingValues(horizontal = 12.dp)
@@ -260,7 +265,7 @@ fun ProjectScreen() {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color(0xAA868599))
+                    .background(PurpleGrey)
                     .clickable { blocksVisible = false }
             )
         }
@@ -269,7 +274,7 @@ fun ProjectScreen() {
                 .offset(x = check)
                 .width(300.dp)
                 .fillMaxHeight()
-                .background(Color(0xFFE0DDFF)),
+                .background(LightLightPurple),
         ) {
             BlockPanel { block ->
                 addBlockInOrder(block)
@@ -313,7 +318,7 @@ fun ProjectScreen() {
                     .navigationBarsPadding()
                     .height(298.dp)
                     .align(Alignment.BottomCenter)
-                    .background(Color(0xFF8685C7))
+                    .background(LightPurple)
             ) {
                 Column(
                     modifier = Modifier
@@ -395,7 +400,7 @@ fun ProjectScreen() {
                     .fillMaxWidth()
                     .height(WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding())
                     .align(Alignment.BottomCenter)
-                    .background(Color(0xFF8685C7))
+                    .background(LightPurple)
             ) {}
         }
 
@@ -405,7 +410,7 @@ fun ProjectScreen() {
                     .fillMaxWidth()
                     .height(WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding())
                     .align(Alignment.BottomCenter)
-                    .background(Color(0xFF5F52F0))
+                    .background(DarkPurple)
             ) {}
         }
     }

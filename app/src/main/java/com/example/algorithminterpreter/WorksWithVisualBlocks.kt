@@ -42,6 +42,15 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import com.example.algorithminterpreter.ui.theme.AssignmentColor
+import com.example.algorithminterpreter.ui.theme.ConsoleColor
+import com.example.algorithminterpreter.ui.theme.ConstColor
+import com.example.algorithminterpreter.ui.theme.FontColor
+import com.example.algorithminterpreter.ui.theme.IfColor
+import com.example.algorithminterpreter.ui.theme.IntColor
+import com.example.algorithminterpreter.ui.theme.LightColor
+import com.example.algorithminterpreter.ui.theme.StaplesColor
+import com.example.algorithminterpreter.ui.theme.WhileColor
 import kotlin.math.roundToInt
 
 private fun Char.isEnglishLetter(): Boolean {
@@ -72,7 +81,7 @@ fun FreeWorkspaceBlocksArea(
     Box(
         Modifier
             .fillMaxSize()
-            .background(Color(0xFFD6EAF8), RoundedCornerShape(12.dp))
+            .background(LightColor, RoundedCornerShape(12.dp))
             .pointerInput(selectedBlock) {
                 detectTapGestures { offset ->
                     if (selectedBlock != null) {
@@ -178,7 +187,7 @@ fun BlockView(
         is ConsoleRead -> {
             Box(
                 modifier = Modifier
-                    .background(shape = ConsoleReadBlocks(), color = Color(0xFF9A66FF))
+                    .background(shape = ConsoleReadBlocks(), color = ConsoleColor)
                     .width(250.dp)
                     .height(95.dp),
                 contentAlignment = Alignment.Center
@@ -207,7 +216,7 @@ fun BlockView(
         is ConsoleWrite -> {
             Box(
                 modifier = Modifier
-                    .background(shape = ConsoleWriteBlocks(), color = Color(0xFF9A66FF))
+                    .background(shape = ConsoleWriteBlocks(), color = ConsoleColor)
                     .width(250.dp)
                     .height(95.dp),
                 contentAlignment = Alignment.Center
@@ -316,7 +325,7 @@ fun BlockView(
                 modifier = Modifier
                     .width(180.dp)
                     .height(80.dp)
-                    .background(Color(0xFFD25AE0), RoundedCornerShape(cornerRadius))
+                    .background(StaplesColor, RoundedCornerShape(cornerRadius))
                     .border(2.dp, Color.White, RoundedCornerShape(cornerRadius))
                     .padding(horizontal = 2.dp)
             ) {
@@ -356,7 +365,7 @@ fun BlockView(
         is IntVariable -> {
             Box(
                 modifier = Modifier
-                    .background(shape = IntBlock(), color = Color(0xFF35C1FE))
+                    .background(shape = IntBlock(), color = IntColor)
                     .width(150.dp)
                     .height(95.dp),
                 contentAlignment = Alignment.Center
@@ -386,7 +395,7 @@ fun BlockView(
         is IntArray -> {
             Box(
                 modifier = Modifier
-                    .background(shape = IntBlockArray(), color = Color(0xFF35C1FE))
+                    .background(shape = IntBlockArray(), color = IntColor)
                     .width(260.dp)
                     .height(95.dp),
                 contentAlignment = Alignment.Center
@@ -440,7 +449,7 @@ fun BlockView(
         is Assignment -> {
             Box(
                 modifier = Modifier
-                    .background(shape = GreenAssignmentBlocks(), color = Color(0xFF71C94F))
+                    .background(shape = GreenAssignmentBlocks(), color = AssignmentColor)
                     .width(195.dp)
                     .height(95.dp),
                 contentAlignment = Alignment.Center
@@ -454,7 +463,7 @@ fun BlockView(
                         modifier = Modifier
                             .width(56.dp)
                             .height(57.dp)
-                            .background(Color(0xFF35C1FE), RoundedCornerShape(8.dp))
+                            .background(IntColor, RoundedCornerShape(8.dp))
                             .border(2.dp, Color.White, RoundedCornerShape(8.dp))
                     ) { }
                     Text(
@@ -477,7 +486,7 @@ fun BlockView(
         is If -> {
             Box(
                 modifier = Modifier
-                    .background(shape = BlockIf(), color = Color(0xFFFFAD19))
+                    .background(shape = BlockIf(), color = IfColor)
                     .width(250.dp)
                     .height(95.dp),
                 contentAlignment = Alignment.Center
@@ -507,7 +516,7 @@ fun BlockView(
         is IfElse -> {
             Box(
                 modifier = Modifier
-                    .background(shape = BlockIfElse(), color = Color(0xFFFFAD19))
+                    .background(shape = BlockIfElse(), color = IfColor)
                     .width(250.dp)
                     .height(95.dp),
                 contentAlignment = Alignment.Center
@@ -537,7 +546,7 @@ fun BlockView(
         is While -> {
             Box(
                 modifier = Modifier
-                    .background(shape = BlockWhile(), color = Color(0xFFFF5755))
+                    .background(shape = BlockWhile(), color = WhileColor)
                     .width(250.dp)
                     .height(95.dp),
                 contentAlignment = Alignment.Center
@@ -570,7 +579,7 @@ fun BlockView(
                 modifier = Modifier
                     .width(55.dp)
                     .height(56.dp)
-                    .background(Color(0xFF057CDE), RoundedCornerShape(6.dp))
+                    .background(ConstColor, RoundedCornerShape(6.dp))
                     .border(2.dp, Color.White, RoundedCornerShape(6.dp)),
                 contentAlignment = Alignment.Center
             )
@@ -600,7 +609,7 @@ fun BlockView(
                             if (inputValue.isEmpty()) {
                                 Text(
                                     text = "0",
-                                    color = Color(0xFFD0D0D0),
+                                    color = FontColor,
                                     fontSize = 28.sp,
                                     fontWeight = FontWeight.Normal
                                 )
@@ -617,7 +626,7 @@ fun BlockView(
                 modifier = Modifier
                     .width(140.dp)
                     .height(56.dp)
-                    .background(Color(0xFF35C1FE), RoundedCornerShape(6.dp))
+                    .background(IntColor, RoundedCornerShape(6.dp))
                     .border(2.dp, Color.White, RoundedCornerShape(6.dp)),
                 contentAlignment = Alignment.Center
             ) {
@@ -642,7 +651,7 @@ fun BlockView(
                         cursorBrush = SolidColor(Color.White),
                         textStyle = TextStyle(
                             fontSize = 25.sp,
-                            color = if (block.name.isEmpty()) Color(0xFFD0D0D0) else Color.White,
+                            color = if (block.name.isEmpty()) FontColor else Color.White,
                             fontWeight = FontWeight.Bold
                         ),
                         decorationBox = { innerTextField ->
@@ -650,7 +659,7 @@ fun BlockView(
                                 if (block.name.isEmpty()) {
                                     Text(
                                         text = "name",
-                                        color = Color(0xFFD0D0D0),
+                                        color = FontColor,
                                         fontSize = 18.sp,
                                     )
                                 }
@@ -696,7 +705,7 @@ fun BlockView(
                                 if (block.index.isEmpty()) {
                                     Text(
                                         text = "i",
-                                        color = Color(0xFFD0D0D0),
+                                        color = FontColor,
                                         fontSize = 20.sp,
                                     )
                                 }
@@ -722,7 +731,7 @@ fun BlockView(
                 modifier = Modifier
                     .width(55.dp)
                     .height(56.dp)
-                    .background(Color(0xFF35C1FE), RoundedCornerShape(6.dp))
+                    .background(IntColor, RoundedCornerShape(6.dp))
                     .border(2.dp, Color.White, RoundedCornerShape(6.dp)),
                 contentAlignment = Alignment.Center
             )
@@ -754,7 +763,7 @@ fun BlockView(
                             if (inputValue.isEmpty()) {
                                 Text(
                                     text = "X",
-                                    color = Color(0xFFD0D0D0),
+                                    color = FontColor,
                                     fontSize = 28.sp,
                                     fontWeight = FontWeight.Normal
                                 )

@@ -13,75 +13,84 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import com.example.algorithminterpreter.ui.theme.ArithmeticColor
+import com.example.algorithminterpreter.ui.theme.AssignmentColor
+import com.example.algorithminterpreter.ui.theme.ComparisonColor
+import com.example.algorithminterpreter.ui.theme.ConsoleColor
+import com.example.algorithminterpreter.ui.theme.ConstColor
+import com.example.algorithminterpreter.ui.theme.IfColor
+import com.example.algorithminterpreter.ui.theme.IntColor
+import com.example.algorithminterpreter.ui.theme.StaplesColor
+import com.example.algorithminterpreter.ui.theme.WhileColor
 import java.util.UUID
 
 open class Block(val id: UUID, val color: Color)
 
-class Const(id: UUID) : Block(id, Color(0xFF057CDE)) {
+class Const(id: UUID) : Block(id, ConstColor) {
     var value: String = ""
 }
 
-class Variable(id: UUID) : Block(id, Color(0xFF35C1FE)) {
+class Variable(id: UUID) : Block(id, IntColor) {
     var name: String = ""
 }
 
-class ArrayElem(id: UUID) : Block(id, Color(0xFF35C1FE)) {
+class ArrayElem(id: UUID) : Block(id, IntColor) {
     var name: String = ""
     var index: String = ""
 }
 
-class IntVariable(id: UUID) : Block(id, Color(0xFF35C1FE)) {
+class IntVariable(id: UUID) : Block(id, IntColor) {
     var variable: String = ""
 }
 
 class IntArray(id: UUID, val text: String = "int[]") :
-    Block(id, Color(0xFF35C1FE)) {
+    Block(id, IntColor) {
     var variable: String = ""
     var size: String = ""
 }
 
-class Staples(id: UUID) : Block(id, Color(0xFFBA68C8)) {
+class Staples(id: UUID) : Block(id, StaplesColor) {
     var elem: List<Block> = emptyList()
 }
 
 class ArithmeticOperation(id: UUID, val text: String) :
-    Block(id, Color(0xFF2F860D))
+    Block(id, ArithmeticColor)
 
 class ComparisonOperation(id: UUID, val text: String) :
-    Block(id, Color(0xFFF89402)) {
+    Block(id, ComparisonColor) {
     var left: List<Block> = emptyList()
     var right: List<Block> = emptyList()
 }
 
 class Assignment(id: UUID, val text: String = "x =") :
-    Block(id, Color(0xFF71C94F)) {
+    Block(id, AssignmentColor) {
     var variable: Variable? = null
     var value: List<Block> = emptyList()
 }
 
-class If(id: UUID) : Block(id, Color(0xFFFFAD19)) {
+class If(id: UUID) : Block(id, IfColor) {
     var condition: List<Block> = emptyList()
     var body: List<Block> = emptyList()
 }
 
-class IfElse(id: UUID) : Block(id, Color(0xFFFFAD19)) {
+class IfElse(id: UUID) : Block(id, IfColor) {
     var condition: List<Block> = emptyList()
     var ifBody: List<Block> = emptyList()
     var elseBody: List<Block> = emptyList()
 }
 
-class While(id: UUID) : Block(id, Color(0xFFFF5755)) {
+class While(id: UUID) : Block(id, WhileColor) {
     var condition: List<Block> = emptyList()
     var body: List<Block> = emptyList()
 }
 
 class ConsoleRead(id: UUID, val text: String = "console.read") :
-    Block(id, Color(0xFF9A66FF)) {
+    Block(id, ConsoleColor) {
     var elem: Block? = null
 }
 
 class ConsoleWrite(id: UUID, val text: String = "console.write") :
-    Block(id, Color(0xFF9A66FF)) {
+    Block(id, ConsoleColor) {
     var elem: Block? = null
 }
 

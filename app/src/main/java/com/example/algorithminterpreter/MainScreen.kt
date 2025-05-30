@@ -1,3 +1,5 @@
+package com.example.algorithminterpreter
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -23,8 +25,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.algorithminterpreter.R
-import com.example.algorithminterpreter.TomorrowFont
+import com.example.algorithminterpreter.ui.theme.DarkPurple
+import com.example.algorithminterpreter.ui.theme.Purple
 
 @Composable
 fun StartScreen(
@@ -35,14 +37,14 @@ fun StartScreen(
         modifier = modifier
             .fillMaxSize()
             .statusBarsPadding()
-            .background(Color(0xFF5F52F0))
+            .background(DarkPurple)
             .navigationBarsPadding()
 
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFF6D60F8))
+                .background(Purple)
                 .padding(40.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
@@ -61,7 +63,7 @@ fun StartScreen(
                     .padding(horizontal = 70.dp)
                     .border(4.dp, Color.White, RoundedCornerShape(25.dp)),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF6D60F8),
+                    containerColor = Purple,
                     contentColor = Color.White
                 )
             ) {
