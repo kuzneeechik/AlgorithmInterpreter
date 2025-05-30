@@ -1,4 +1,5 @@
 package com.example.algorithminterpreter
+
 import BlockIf
 import BlockIfElse
 import BlockWhile
@@ -46,6 +47,7 @@ import kotlin.math.roundToInt
 private fun Char.isEnglishLetter(): Boolean {
     return this in 'a'..'z' || this in 'A'..'Z'
 }
+
 @Composable
 fun FreeWorkspaceBlocksArea(
     blocks: MutableList<PositionedBlock>,
@@ -99,15 +101,18 @@ fun FreeWorkspaceBlocksArea(
                             isDragging -> 10f // перетаскиваемый  ВСЕГДА сверху
                             positionedBlock.block is Const || positionedBlock.block is Variable ||
                                     positionedBlock.block is ArrayElem || positionedBlock.block is ArithmeticOperation -> 3f
+
                             positionedBlock.block is ComparisonOperation || positionedBlock.block is Staples ||
                                     positionedBlock.block is IntVariable || positionedBlock.block is IntArray ||
                                     positionedBlock.block is Assignment -> 2f
+
                             else -> 1f
                         }
                     )
                     .offset {
                         val currentPosition = positionedBlock.position
-                        var newPosition = if (isDragging) currentPosition + dragOffset else currentPosition
+                        var newPosition =
+                            if (isDragging) currentPosition + dragOffset else currentPosition
 
                         newPosition = newPosition.copy(
                             x = newPosition.x.coerceAtLeast(leftPanelWidthPx - halfBlockWidthPx),
@@ -159,6 +164,7 @@ fun FreeWorkspaceBlocksArea(
         }
     }
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BlockView(
@@ -226,6 +232,7 @@ fun BlockView(
                 }
             }
         }
+
         is ArithmeticOperation -> {
             Box(
                 modifier = Modifier
@@ -571,7 +578,7 @@ fun BlockView(
                 BasicTextField(
                     value = inputValue,
                     onValueChange = { newValue ->
-                        if (newValue.all { ( it.isDigit()) }) {
+                        if (newValue.all { (it.isDigit()) }) {
                             onInputChange(newValue)
                         }
                     },
@@ -644,7 +651,7 @@ fun BlockView(
                                     Text(
                                         text = "name",
                                         color = Color(0xFFD0D0D0),
-                                        fontSize = 17.sp,
+                                        fontSize = 18.sp,
                                     )
                                 }
                                 innerTextField()
@@ -661,7 +668,6 @@ fun BlockView(
                         fontWeight = FontWeight.Bold
                     )
 
-                    Spacer(modifier = Modifier.width(2.dp))
                     BasicTextField(
                         value = block.index,
                         onValueChange = { newIndex ->
@@ -691,15 +697,13 @@ fun BlockView(
                                     Text(
                                         text = "i",
                                         color = Color(0xFFD0D0D0),
-                                        fontSize = 25.sp,
+                                        fontSize = 20.sp,
                                     )
                                 }
                                 innerTextField()
                             }
                         }
                     )
-
-                    Spacer(modifier = Modifier.width(2.dp))
 
                     Text(
                         text = "]",
@@ -713,7 +717,6 @@ fun BlockView(
         }
 
 
-
         is Variable -> {
             Box(
                 modifier = Modifier
@@ -723,7 +726,8 @@ fun BlockView(
                     .border(2.dp, Color.White, RoundedCornerShape(6.dp)),
                 contentAlignment = Alignment.Center
             )
-            {  Spacer(modifier = Modifier.width(8.dp))
+            {
+                Spacer(modifier = Modifier.width(8.dp))
 
                 BasicTextField(
                     value = inputValue,

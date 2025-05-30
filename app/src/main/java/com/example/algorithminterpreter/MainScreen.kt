@@ -31,12 +31,13 @@ fun StartScreen(
     onNewProject: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Box(modifier = modifier
-        .fillMaxSize()
-        .statusBarsPadding()
-        .background(Color(0xFF5F52F0))
-        .navigationBarsPadding()
-       
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .statusBarsPadding()
+            .background(Color(0xFF5F52F0))
+            .navigationBarsPadding()
+
     ) {
         Column(
             modifier = Modifier

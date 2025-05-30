@@ -33,6 +33,7 @@ class ArrayElem(id: UUID) : Block(id, Color(0xFF35C1FE)) {
 class IntVariable(id: UUID) : Block(id, Color(0xFF35C1FE)) {
     var variable: String = ""
 }
+
 class IntArray(id: UUID, val text: String = "int[]") :
     Block(id, Color(0xFF35C1FE)) {
     var variable: String = ""
@@ -124,8 +125,7 @@ fun BlockPanel(onBlockClick: (Block) -> Unit) {
     ) {
         val onRow = mutableListOf<Block>()
         blocks.forEach { block ->
-            if (block is Const || block is Variable || block is ArrayElem)
-            {
+            if (block is Const || block is Variable || block is ArrayElem) {
                 onRow.add(block)
             }
         }
