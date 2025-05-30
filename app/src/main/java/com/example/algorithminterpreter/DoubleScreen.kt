@@ -1,5 +1,10 @@
 package com.example.algorithminterpreter
 
+import kotlinx.coroutines.launch
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
+import kotlin.coroutines.Continuation
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.ui.text.input.ImeAction
@@ -65,35 +70,64 @@ fun ProjectScreen() {
     )
     // открыта закрыта панель блоков
 
+    var inputContinuation: Continuation<String>? by remember { mutableStateOf(null) }
     var waitingForStartInput by remember { mutableStateOf(false) }
     val inputQueue = remember { mutableStateListOf<String>() }  // очередь введённых строк
-    val code = "int x console.read x console.write x x = x + 1 console.write x int y console.read y console.write y "
+    var currentPrompt by remember { mutableStateOf<String?>(null) }
+
+    val code = "int n " +
+            "n = 7 " +
+            "int mas[n] " +
+            "int i " +
+            "while i < n " +
+            "console.read mas[i] " +
+            "i = i + 1 endwhile " +
+            "int j " +
+            "int k " +
+            "int b " +
+            "while j < n " +
+            "k = 0 " +
+            "while k < n - 1 " +
+            "if mas[k] > mas[k + 1] " +
+            "b = mas[k] " +
+            "mas[k] = mas[k + 1] " +
+            "mas[k + 1] = b endif k = k + 1 endwhile j = j + 1 endwhile " +
+            "i = 0 " +
+            "while i < n " +
+            "console.write mas[i] i = i + 1 endwhile"
 
     fun output(text: String) {
         consoleOutput.add(text)
     }
 
+    suspend fun awaitInput(variableName: String): String {
+        return suspendCoroutine { continuation ->
+            currentPrompt = "Введите $variableName:"
+            inputContinuation = continuation
+            waitingForStartInput = true
+        }
+    }
+
+    val coroutineScope = rememberCoroutineScope()
+
     fun startInterpreter() {
-        try {
-            val lexer = Lexer(code)
-            lexer.lexAnalysis()
+        consoleOutput.clear()
+        inputQueue.clear()
 
-            val parser = Parser(lexer.tokens, ::output)
 
-            parser.getInput = {
-                while (inputQueue.isEmpty()) {
+        coroutineScope.launch {
+            try {
+                val lexer = Lexer(code)
+                lexer.lexAnalysis()
+                val parser = Parser(lexer.tokens, ::output)
 
-                    kotlinx.coroutines.runBlocking {
-                        kotlinx.coroutines.delay(100)
-                    }
-                }
-                inputQueue.removeAt(0)
+                parser.getInput = { awaitInput(it) }
+
+                val rootNode = parser.parseCode()
+                parser.run(rootNode)
+            } catch (e: Exception) {
+                output("Error occurred: ${e.message}")
             }
-
-            val rootNode = parser.parseCode()
-            parser.run(rootNode)
-        } catch (e: Exception) {
-            output("Error occurred: ${e.message}")
         }
     }
 
@@ -167,15 +201,10 @@ fun ProjectScreen() {
                     onClick = {
                         consoleOutput.clear()
                         consoleInputText = ""
+                        inputQueue.clear()
+                        waitingForStartInput = false
 
-                        if (code.contains("console.read")) {
-                            consoleVisible = true
-                            waitingForStartInput = true
-                        } else {
-                            inputQueue.clear()
-                            startInterpreter()
-                        }
-                        consoleInputText = ""
+                        startInterpreter()
                     },
                     modifier = Modifier
                         .padding(start = 16.dp)
@@ -317,6 +346,14 @@ fun ProjectScreen() {
                         .padding(horizontal = 8.dp, vertical = 10.dp)
                         .align(Alignment.TopCenter)
                 ) {
+                    if (currentPrompt != null) {
+                        Text(
+                            text = currentPrompt!!,
+                            fontSize = 20.sp,
+                            color = Color.White,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                    }
                     BasicTextField(
                         value = consoleInputText,
                         onValueChange = { consoleInputText = it },
@@ -340,9 +377,11 @@ fun ProjectScreen() {
                                     val inputs = input.split(Regex("\\s+"))
                                     inputQueue.clear()
                                     inputQueue.addAll(inputs)
-                                    // НЕ очищаем здесь, ждем нажатия Start
+                                    inputContinuation?.resume(inputs[0])
+                                    inputContinuation = null
+                                    consoleInputText = ""
                                     waitingForStartInput = false
-                                    startInterpreter()
+                                    currentPrompt = null
                                 }
                             }
                         ),
