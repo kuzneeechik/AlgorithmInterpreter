@@ -47,6 +47,6 @@ class Lexer(private var code: String) {
                 return true
             }
         }
-        throw Error ("There is error on the position $pos")
+        throw Exception ("There is error on the position $pos")
     }
 }

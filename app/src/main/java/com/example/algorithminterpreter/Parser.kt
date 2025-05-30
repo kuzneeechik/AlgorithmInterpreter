@@ -1,9 +1,7 @@
 package com.example.algorithminterpreter
 import com.example.algorithminterpreter.ast.*
 
-class BreakException : RuntimeException()
-class ContinueException : RuntimeException()
-class Parser(private val tokens: List<Token>)
+class Parser(private val tokens: List<Token>, private val output: (String) -> Unit)
 {
     private var pos: Int = 0
     private var scope = mutableMapOf<String, Any>()
@@ -33,7 +31,8 @@ class Parser(private val tokens: List<Token>)
 
     private fun require(vararg expected: TokenType): Token
     {
-        val token = match(*expected) ?: throw Error("${expected[0].name} is expected in the position $pos")
+        val token = match(*expected) ?:
+        throw Exception("${expected[0].name} is expected in the position $pos")
 
         return token
     }
@@ -64,7 +63,7 @@ class Parser(private val tokens: List<Token>)
             return VariableNode(variable)
         }
 
-        throw Error("Variable or number is expected in the position $pos")
+        throw Exception("Variable or number is expected in the position $pos")
     }
 
     private fun parseParentheses(): ExpressionNode
@@ -151,7 +150,7 @@ class Parser(private val tokens: List<Token>)
             return UnarOperationNode(tokenPrint, parseFormula())
         }
 
-        throw Error("The 'console.write' operator is expected in the position $pos")
+        throw Exception("The 'console.write' operator is expected in the position $pos")
     }
 
     private fun parseRead(): ExpressionNode
@@ -165,7 +164,7 @@ class Parser(private val tokens: List<Token>)
             return UnarOperationNode(tokenRead, parseVariableOrNumber())
         }
 
-        throw Error("The 'console.read' operator is expected in the position $pos")
+        throw Exception("The 'console.read' operator is expected in the position $pos")
     }
 
     private fun parseInitialization(): ExpressionNode
@@ -177,7 +176,7 @@ class Parser(private val tokens: List<Token>)
         if (tokenInit != null)
         {
             val variable = match(tokenTypeList.find { it.name == "VARIABLE" }!!)
-                ?: throw Error("Variable name expected after 'int'")
+                ?: throw Exception("Variable name expected after 'int'")
 
             if (match(tokenTypeList.find { it.name == "LEFT BRACKET"}!!) != null)
             {
@@ -192,7 +191,7 @@ class Parser(private val tokens: List<Token>)
             return UnarOperationNode(tokenInit, parseVariableOrNumber())
         }
 
-        throw Error("The 'int' operator is expected in the position $pos")
+        throw Exception("The 'int' operator is expected in the position $pos")
     }
 
     private fun parseExpression(): ExpressionNode
@@ -238,18 +237,6 @@ class Parser(private val tokens: List<Token>)
                 val whileNode = parseWhile()
                 return whileNode
             }
-
-            else if (match(tokenTypeList.find { it.name == "BREAK" }!!) != null)
-            {
-                val breakNode = BreakNode()
-                return breakNode
-            }
-
-            else if (match(tokenTypeList.find { it.name == "CONTINUE" }!!) != null)
-            {
-                val continueNode = ContinueNode()
-                return continueNode
-            }
         }
 
         pos -= 1
@@ -264,7 +251,7 @@ class Parser(private val tokens: List<Token>)
             return BinOperationNode(assignOperator, variableNode, rightFormulaNode)
         }
 
-        throw Error("The assign operator is expected in the position $pos")
+        throw Exception("The 'assign' operator is expected in the position $pos")
     }
 
     private fun parseIf(): ExpressionNode
@@ -403,19 +390,19 @@ class Parser(private val tokens: List<Token>)
 
                             is ArrayNode -> {
                                 val array = (scope[left.array.text] as? ArrayValue)?.array
-                                    ?: throw Error("Variable ${left.array.text} is not an array")
+                                    ?: throw Exception("Variable '${left.array.text}' is not an array")
 
                                 val index = run(left.index) as Long
 
                                 if (index !in 0 until array.size)
                                 {
-                                    throw Error("Index $index out of range")
+                                    throw Exception("Index $index out of range")
                                 }
 
                                 array[index.toInt()] = result as Long
                             }
 
-                            else -> throw Error("Left side must be variable or array")
+                            else -> throw Exception("Left side must be variable or array")
                         }
 
                         return result
@@ -427,18 +414,19 @@ class Parser(private val tokens: List<Token>)
                 when (node.operator.type.name)
                 {
                     "WRITE" -> {
-                        print(run(node.operand))
-                        print(' ')
+                        val result = run(node.operand).toString()
+                        output(result)
                     }
                     "READ" -> {
-                        val value = readln().toLongOrNull() ?: throw Error("Incorrect input")
+                        val value = readln().toLongOrNull() ?: throw Exception("Incorrect input")
 
                         when (val currentNode = node.operand)
                         {
                             is VariableNode -> {
                                 if (scope[currentNode.variable.text] == null)
                                 {
-                                    println("The variable with name ${currentNode.variable.text} not found")
+                                    throw Exception("The variable with name " +
+                                            "'${currentNode.variable.text}' not found")
                                 }
                                 else
                                 {
@@ -448,18 +436,20 @@ class Parser(private val tokens: List<Token>)
 
                             is ArrayNode -> {
                                 val arrayData = (scope[currentNode.array.text] as? ArrayValue)?.array
-                                    ?: throw Error("Variable ${currentNode.array.text} is not an array")
+                                    ?: throw Exception("Variable '${currentNode.array.text}' " +
+                                            "is not an array")
 
                                 val index = run(currentNode.index) as Long
 
                                 if (index !in 0 until arrayData.size) {
-                                    throw Error("Index $index out of range")
+                                    throw Exception("Index $index out of range")
                                 }
 
                                 arrayData[index.toInt()] = value
                             }
 
-                            else -> throw Error("Operand for READ must be a variable or an array element")
+                            else -> throw Exception("Operand for READ must be" +
+                                    " a variable or an array element")
                         }
                     }
                     "INIT" -> {
@@ -496,7 +486,7 @@ class Parser(private val tokens: List<Token>)
 
                 if (size <= 0)
                 {
-                    throw Error("Array size must be positive")
+                    throw Exception("Array size must be positive")
                 }
 
                 val array = MutableList(size.toInt()) { 0L }
@@ -506,32 +496,36 @@ class Parser(private val tokens: List<Token>)
 
             is ArrayNode -> {
                 val array = (scope[node.array.text] as? ArrayValue)?.array
-                    ?: throw Error("Variable ${node.array.text} is not an array")
+                    ?: throw Exception("Variable '${node.array.text}' is not an array")
 
                 val index = run(node.index) as Long
 
                 if (index !in 0 until array.size)
                 {
-                    throw Error("Index $index out of range")
+                    throw Exception("Index $index out of range")
                 }
 
                 return array[index.toInt()]
             }
 
             is WhileNode -> {
+                val maxIterations = 10_000
+                var counter = 0
+
                 while (true)
                 {
+                    counter++
+
+                    if (counter > maxIterations)
+                    {
+                        throw Exception("An infinite loop has been started")
+                    }
+
                     val conditionResult = run(node.condition)
 
                     if (conditionResult is Boolean && conditionResult)
                     {
-                        try {
-                            run(node.body)
-                        } catch (e: BreakException) {
-                            break
-                        } catch (e: ContinueException) {
-                            continue
-                        }
+                        run(node.body)
                     }
                     else
                     {
@@ -539,10 +533,6 @@ class Parser(private val tokens: List<Token>)
                     }
                 }
             }
-
-            is BreakNode -> throw BreakException()
-
-            is ContinueNode -> throw ContinueException()
 
             else -> println("Error!")
         }
