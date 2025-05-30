@@ -588,7 +588,7 @@ fun BlockView(
                 modifier = Modifier
                     .width(140.dp)
                     .height(56.dp)
-                    .background(Color(0xFF057CDE), RoundedCornerShape(6.dp))
+                    .background(Color(0xFF35C1FE), RoundedCornerShape(6.dp))
                     .border(2.dp, Color.White, RoundedCornerShape(6.dp)),
                 contentAlignment = Alignment.Center
             ) {

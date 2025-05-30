@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import java.util.UUID
 
 open class Block(val id: UUID, val color: Color)
@@ -89,11 +90,12 @@ fun BlockPanel(onBlockClick: (Block) -> Unit) {
     val blocks = listOf(
         Variable(UUID.randomUUID()),
         Const(UUID.randomUUID()),
+        ArrayElem(UUID.randomUUID()),
         ArithmeticOperation(UUID.randomUUID(), "+"),
         ArithmeticOperation(UUID.randomUUID(), "—"),
         ArithmeticOperation(UUID.randomUUID(), "*"),
-        ArithmeticOperation(UUID.randomUUID(), "/"),
         ArithmeticOperation(UUID.randomUUID(), "%"),
+        ArithmeticOperation(UUID.randomUUID(), "/"),
         ComparisonOperation(UUID.randomUUID(), ">"),
         ComparisonOperation(UUID.randomUUID(), "<"),
         ComparisonOperation(UUID.randomUUID(), ">="),
@@ -108,8 +110,7 @@ fun BlockPanel(onBlockClick: (Block) -> Unit) {
         IfElse(UUID.randomUUID()),
         While(UUID.randomUUID()),
         ConsoleRead(UUID.randomUUID()),
-        ConsoleWrite(UUID.randomUUID()),
-        ArrayElem(UUID.randomUUID())
+        ConsoleWrite(UUID.randomUUID())
     )
 
     Column(
@@ -123,103 +124,115 @@ fun BlockPanel(onBlockClick: (Block) -> Unit) {
     ) {
         val onRow = mutableListOf<Block>()
         blocks.forEach { block ->
-            if (block is Const || block is Variable || block is ArrayElem) {
+            if (block is Const || block is Variable || block is ArrayElem)
+            {
                 onRow.add(block)
             }
         }
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .padding(vertical = 12.dp)
+                    .background(onRow[1].color, RoundedCornerShape(8.dp))
+                    .clickable { onBlockClick(onRow[1]) }
+                    .zIndex(3f) // первый уровень
+            ) {
+                BlockView(
+                    block = onRow[1],
+                    onInputChange = {},
+                    isInteractive = false
+                )
+            }
+            Spacer(modifier = Modifier.width(8.dp))
+            Box(
+                modifier = Modifier
+                    .padding(vertical = 16.dp)
+                    .background(onRow[0].color, RoundedCornerShape(8.dp))
+                    .clickable { onBlockClick(onRow[0]) }
+                    .zIndex(3f)
+            ) {
+                BlockView(
+                    block = onRow[0],
+                    onInputChange = {},
+                    isInteractive = false
+                )
+            }
+            Spacer(modifier = Modifier.width(8.dp))
+            Box(
+                modifier = Modifier
+                    .padding(vertical = 16.dp)
+                    .background(onRow[2].color, RoundedCornerShape(8.dp))
+                    .clickable { onBlockClick(onRow[2]) }
+                    .zIndex(3f)
+            ) {
+                BlockView(
+                    block = onRow[2],
+                    onInputChange = {},
+                    isInteractive = false
+                )
+            }
+        }
+        val arithmeticBlocks = blocks.filterIsInstance<ArithmeticOperation>()//это тоже первый
+        val chunkedArithmetic = arithmeticBlocks.chunked(2)
+        chunkedArithmetic.forEach { rowBlocks ->
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(vertical = 8.dp)
+            ) {
+                rowBlocks.forEach { arithmeticBlock ->
+                    Box(
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp, vertical = 12.dp)
+                            .background(arithmeticBlock.color, RoundedCornerShape(8.dp))
+                            .clickable { onBlockClick(arithmeticBlock) }
+                            .zIndex(3f)
+                    ) {
+                        BlockView(
+                            block = arithmeticBlock,
+                            onInputChange = {},
+                            isInteractive = false
+                        )
+                    }
+                }
+            }
+        }
 
-        var flag = true
+        //это второй уровень
         blocks.forEach { block ->
-            if (flag) {
-                flag = false
-                Row(
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
+            if (block is ComparisonOperation || block is Staples || block is IntVariable || block is IntArray || block is Assignment) {
+                Box(
+                    modifier = Modifier
+                        .padding(vertical = 12.dp)
+                        .clickable { onBlockClick(block) }
+                        .zIndex(2f)
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .padding(vertical = 12.dp)
-                            .background(block.color, RoundedCornerShape(8.dp))
-                            .clickable { onBlockClick(onRow[1]) }
-                    ) {
-                        BlockView(
-                            block = onRow[1],
-                            onInputChange = {},
-                            isInteractive = false
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Box(
-                        modifier = Modifier
-                            .padding(vertical = 16.dp)
-                            .background(block.color, RoundedCornerShape(8.dp))
-                            .clickable { onBlockClick(onRow[0]) }
-                    ) {
-                        BlockView(
-                            block = onRow[0],
-                            onInputChange = {},
-                            isInteractive = false
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Box(
-                        modifier = Modifier
-                            .padding(vertical = 16.dp)
-                            .background(block.color, RoundedCornerShape(8.dp))
-                            .clickable { onBlockClick(onRow[2]) }
-                    ) {
-                        BlockView(
-                            block = onRow[2],
-                            onInputChange = {},
-                            isInteractive = false
-                        )
-                    }
+                    BlockView(
+                        block = block,
+                        onInputChange = {},
+                        isInteractive = false
+                    )
                 }
             }
-            val arithmeticBlocks = blocks.filterIsInstance<ArithmeticOperation>()
-            val chunkedArithmetic = arithmeticBlocks.chunked(2)
+        }
 
-            chunkedArithmetic.forEach { rowBlocks ->
-                Row(
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(vertical = 8.dp)
+        // это третий уровень
+        blocks.forEach { block ->
+            if (block is If || block is IfElse || block is While || block is ConsoleRead || block is ConsoleWrite) {
+                Box(
+                    modifier = Modifier
+                        .padding(vertical = 12.dp)
+                        .clickable { onBlockClick(block) }
+                        .zIndex(1f)
                 ) {
-                    rowBlocks.forEach { arithmeticBlock ->
-                        Box(
-                            modifier = Modifier
-                                .padding(horizontal = 8.dp, vertical = 12.dp)
-                                .background(arithmeticBlock.color, RoundedCornerShape(8.dp))
-                                .clickable { onBlockClick(arithmeticBlock) }
-                        ) {
-                            BlockView(
-                                block = arithmeticBlock,
-                                onInputChange = {},
-                                isInteractive = false
-                            )
-                        }
-                    }
-
-                    if (rowBlocks.size == 1) {
-                        Spacer(modifier = Modifier.width(0.dp))
-                    }
-                }
-            }
-
-
-            blocks.forEach { block ->
-                if (block !is Const && block !is Variable && block !is ArrayElem && block !is ArithmeticOperation) {
-                    Box(
-                        modifier = Modifier
-                            .padding(vertical = 12.dp)
-                            .clickable { onBlockClick(block) }
-                    ) {
-                        BlockView(
-                            block = block,
-                            onInputChange = {},
-                            isInteractive = false
-                        )
-                    }
+                    BlockView(
+                        block = block,
+                        onInputChange = {},
+                        isInteractive = false
+                    )
                 }
             }
         }
