@@ -88,7 +88,6 @@ fun FreeWorkspaceBlocksArea(
                 else -> 0
             }
         }
-
         sortedBlocks.forEachIndexed { sortedIndex, positionedBlock ->
             val originalIndex = blocks.indexOf(positionedBlock)
             val isDragging = draggingIndex == originalIndex
