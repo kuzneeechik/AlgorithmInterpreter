@@ -23,6 +23,8 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -37,6 +39,7 @@ data class PositionedBlock(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProjectScreen() {
+    val consoleOutput = remember { mutableStateListOf<String>() }
     var blocksVisible by remember { mutableStateOf(false) }
     var consoleVisible by remember { mutableStateOf(false) }
     val checkConsoleBord by animateDpAsState(
@@ -53,6 +56,25 @@ fun ProjectScreen() {
     )
     // открыта закрыта панель блоков
 
+    fun output(text: String) {
+        consoleOutput.add(text)
+    }
+
+    fun startInterpreter() {
+        try {
+            val code = "int x x = 5 while x > 0 console.write x x = x - 1 endwhile"
+
+
+            val lexer = Lexer(code)
+            lexer.lexAnalysis()
+
+            val parser = Parser(lexer.tokens, ::output)
+            val rootNode = parser.parseCode()
+            parser.run(rootNode)
+        } catch (e: Exception) {
+            output("Error occurred: ${e.message}")
+        }
+    }
 
     fun addBlockInOrder(block: Block) {
         val baseX = 400f
@@ -121,7 +143,7 @@ fun ProjectScreen() {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Button(
-                    onClick = {   consoleInputText = "" },
+                    onClick = { startInterpreter() },
                     modifier = Modifier
                         .padding(start = 16.dp)
                         .height(55.dp)
@@ -289,6 +311,20 @@ fun ProjectScreen() {
                         }
                     }
                 )
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 70.dp, start = 8.dp, end = 8.dp, bottom = 10.dp)
+                ) {
+                    items(consoleOutput) { line ->
+                        Text(
+                            text = line,
+                            fontSize = 18.sp,
+                            color = Color.White,
+                            modifier = Modifier.padding(vertical = 2.dp)
+                        )
+                    }
+                }
             }
         }
 
