@@ -371,8 +371,7 @@ class Parser(private val tokens: List<Token>, private val output: (String) -> Un
                             is VariableNode -> {
                                 if (scope[currentNode.variable.text] == null) {
                                     throw Exception(
-                                        "The variable with name " +
-                                                "'${currentNode.variable.text}' not found"
+                                        "The variable with name '${currentNode.variable.text}' not found"
                                     )
                                 } else {
                                     scope[currentNode.variable.text] = value
@@ -383,8 +382,7 @@ class Parser(private val tokens: List<Token>, private val output: (String) -> Un
                                 val arrayData =
                                     (scope[currentNode.array.text] as? ArrayValue)?.array
                                         ?: throw Exception(
-                                            "Variable '${currentNode.array.text}' " +
-                                                    "is not an array"
+                                            "Variable '${currentNode.array.text}' is not an array"
                                         )
 
                                 val index = run(currentNode.index) as Long
@@ -397,8 +395,7 @@ class Parser(private val tokens: List<Token>, private val output: (String) -> Un
                             }
 
                             else -> throw Exception(
-                                "Operand for READ must be" +
-                                        " a variable or an array element"
+                                "Operand for READ must be a variable or an array element"
                             )
                         }
                     }
