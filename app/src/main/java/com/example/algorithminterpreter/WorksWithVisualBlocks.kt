@@ -57,7 +57,7 @@ fun FreeWorkspaceBlocksArea(
     bottomBoundaryDp: Dp = 190.dp,
     blockWidth: Dp = 270.dp
 ) {
-    var draggingIndex by remember { mutableStateOf<Int?>(null) } // индекс перетаскиваемого блока
+    var draggingIndex by remember { mutableStateOf<Int?>(null) }
     var dragOffset by remember { mutableStateOf(Offset.Zero) }
     val density = LocalDensity.current
     val configuration = LocalConfiguration.current
@@ -66,6 +66,7 @@ fun FreeWorkspaceBlocksArea(
     val topBoundaryPx = with(density) { topBoundaryDp.toPx() }
     val bottomBoundaryPx = with(density) { bottomBoundaryDp.toPx() }
     val halfBlockWidthPx = with(density) { blockWidth.toPx() / 2 }
+
     Box(
         Modifier
             .fillMaxSize()
@@ -73,22 +74,44 @@ fun FreeWorkspaceBlocksArea(
             .pointerInput(selectedBlock) {
                 detectTapGestures { offset ->
                     if (selectedBlock != null) {
-                        onWorkspaceClick(offset) // передача координат клика
+                        onWorkspaceClick(offset)
                     }
                 }
             }
     ) {
-        blocks.forEachIndexed { index, positionedBlock ->
-            val isDragging = draggingIndex == index //  блок перетаскивается или нет
+        //сортировка блоков по zIndex перывй ур сверхуууууу
+        val sortedBlocks = blocks.sortedByDescending {
+            when (it.block) {
+                is Const, is Variable, is ArrayElem, is ArithmeticOperation -> 3
+                is ComparisonOperation, is Staples, is IntVariable, is IntArray, is Assignment -> 2
+                is If, is IfElse, is While, is ConsoleRead, is ConsoleWrite -> 1
+                else -> 0
+            }
+        }
+
+        sortedBlocks.forEachIndexed { sortedIndex, positionedBlock ->
+            val originalIndex = blocks.indexOf(positionedBlock)
+            val isDragging = draggingIndex == originalIndex
+
             Box(
                 modifier = Modifier
-                    .zIndex(if (isDragging) 1f else 0f) //тот который перетаскивается выше всех
+                    .zIndex(
+                        when {
+                            isDragging -> 10f // перетаскиваемый  ВСЕГДА сверху
+                            positionedBlock.block is Const || positionedBlock.block is Variable ||
+                                    positionedBlock.block is ArrayElem || positionedBlock.block is ArithmeticOperation -> 3f
+                            positionedBlock.block is ComparisonOperation || positionedBlock.block is Staples ||
+                                    positionedBlock.block is IntVariable || positionedBlock.block is IntArray ||
+                                    positionedBlock.block is Assignment -> 2f
+                            else -> 1f
+                        }
+                    )
                     .offset {
                         val currentPosition = positionedBlock.position
                         var newPosition = if (isDragging) currentPosition + dragOffset else currentPosition
 
                         newPosition = newPosition.copy(
-                            x = newPosition.x.coerceAtLeast(leftPanelWidthPx - halfBlockWidthPx), // только левая граница
+                            x = newPosition.x.coerceAtLeast(leftPanelWidthPx - halfBlockWidthPx),
                             y = newPosition.y.coerceIn(
                                 topBoundaryPx,
                                 screenHeightPx - bottomBoundaryPx
@@ -97,10 +120,10 @@ fun FreeWorkspaceBlocksArea(
 
                         IntOffset(newPosition.x.roundToInt(), newPosition.y.roundToInt())
                     }
-                    .pointerInput(index) {
+                    .pointerInput(originalIndex) {
                         detectDragGestures(
                             onDragStart = {
-                                draggingIndex = index
+                                draggingIndex = originalIndex
                                 dragOffset = Offset.Zero
                             },
                             onDrag = { _, dragAmount ->
@@ -117,7 +140,7 @@ fun FreeWorkspaceBlocksArea(
                                             screenHeightPx - bottomBoundaryPx
                                         )
                                     )
-                                        // фиксация новой позиции после перетаскивания
+
                                     onBlockMove(idx, finalPosition - blocks[idx].position)
                                 }
                                 draggingIndex = null
@@ -130,7 +153,7 @@ fun FreeWorkspaceBlocksArea(
                     block = positionedBlock.block,
                     inputValue = positionedBlock.inputValue,
                     onInputChange = { newValue ->
-                        blocks[index] = positionedBlock.copy(inputValue = newValue)
+                        blocks[originalIndex] = positionedBlock.copy(inputValue = newValue)
                     }
                 )
             }
@@ -622,7 +645,7 @@ fun BlockView(
                                     Text(
                                         text = "name",
                                         color = Color(0xFFD0D0D0),
-                                        fontSize = 20.sp,
+                                        fontSize = 17.sp,
                                     )
                                 }
                                 innerTextField()

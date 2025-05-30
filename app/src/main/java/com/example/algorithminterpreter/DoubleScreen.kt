@@ -31,7 +31,13 @@ import kotlinx.coroutines.delay
 data class PositionedBlock(
     val block: Block,
     var position: Offset,
-    var inputValue: String = ""
+    var inputValue: String = "",
+    val zIndex: Float = when (block) {
+        is Const, is Variable, is ArrayElem, is ArithmeticOperation -> 3f  //выше всех
+        is ComparisonOperation, is Staples, is IntVariable, is IntArray, is Assignment -> 2f
+        is If, is IfElse, is While, is ConsoleRead, is ConsoleWrite -> 1f
+        else -> 0f
+    }
 )
 
 @OptIn(ExperimentalMaterial3Api::class)

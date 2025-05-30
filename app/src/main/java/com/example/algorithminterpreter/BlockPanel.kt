@@ -152,7 +152,7 @@ fun BlockPanel(onBlockClick: (Block) -> Unit) {
                     .padding(vertical = 16.dp)
                     .background(onRow[0].color, RoundedCornerShape(8.dp))
                     .clickable { onBlockClick(onRow[0]) }
-                    .zIndex(3f)
+                    .zIndex(1f)
             ) {
                 BlockView(
                     block = onRow[0],
@@ -226,7 +226,7 @@ fun BlockPanel(onBlockClick: (Block) -> Unit) {
                     modifier = Modifier
                         .padding(vertical = 12.dp)
                         .clickable { onBlockClick(block) }
-                        .zIndex(1f)
+                        .zIndex(3f)
                 ) {
                     BlockView(
                         block = block,
