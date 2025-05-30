@@ -16,23 +16,24 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
@@ -56,17 +57,15 @@ fun FreeWorkspaceBlocksArea(
     bottomBoundaryDp: Dp = 190.dp,
     blockWidth: Dp = 270.dp
 ) {
-    var draggingIndex by remember { mutableStateOf<Int?>(null) }
+    var draggingIndex by remember { mutableStateOf<Int?>(null) } // индекс перетаскиваемого блока
     var dragOffset by remember { mutableStateOf(Offset.Zero) }
     val density = LocalDensity.current
     val configuration = LocalConfiguration.current
     val screenHeightPx = with(density) { configuration.screenHeightDp.dp.toPx() }
-
     val leftPanelWidthPx = with(density) { leftPanelWidth.toPx() }
     val topBoundaryPx = with(density) { topBoundaryDp.toPx() }
     val bottomBoundaryPx = with(density) { bottomBoundaryDp.toPx() }
     val halfBlockWidthPx = with(density) { blockWidth.toPx() / 2 }
-
     Box(
         Modifier
             .fillMaxSize()
@@ -74,16 +73,16 @@ fun FreeWorkspaceBlocksArea(
             .pointerInput(selectedBlock) {
                 detectTapGestures { offset ->
                     if (selectedBlock != null) {
-                        onWorkspaceClick(offset)
+                        onWorkspaceClick(offset) // передача координат клика
                     }
                 }
             }
     ) {
         blocks.forEachIndexed { index, positionedBlock ->
-            val isDragging = draggingIndex == index
+            val isDragging = draggingIndex == index //  блок перетаскивается или нет
             Box(
                 modifier = Modifier
-                    .zIndex(if (isDragging) 1f else 0f)
+                    .zIndex(if (isDragging) 1f else 0f) //тот который перетаскивается выше всех
                     .offset {
                         val currentPosition = positionedBlock.position
                         var newPosition = if (isDragging) currentPosition + dragOffset else currentPosition
@@ -118,7 +117,7 @@ fun FreeWorkspaceBlocksArea(
                                             screenHeightPx - bottomBoundaryPx
                                         )
                                     )
-
+                                        // фиксация новой позиции после перетаскивания
                                     onBlockMove(idx, finalPosition - blocks[idx].position)
                                 }
                                 draggingIndex = null
@@ -144,7 +143,6 @@ fun FreeWorkspaceBlocksArea(
 fun BlockView(
     block: Block,
     inputValue: String = "",
-    isSelected: Boolean = false,
     isInteractive: Boolean = true,
     onInputChange: (String) -> Unit = {},
 ) {
@@ -177,8 +175,8 @@ fun BlockView(
                     )
                 }
             }
-
         }
+
         is ConsoleWrite -> {
             Box(
                 modifier = Modifier
@@ -207,6 +205,7 @@ fun BlockView(
                 }
             }
         }
+
         is ArithmeticOperation -> {
             Box(
                 modifier = Modifier
@@ -239,7 +238,6 @@ fun BlockView(
         }
 
         is ComparisonOperation -> {
-
             val operator = when (block.text) {
                 ">" -> ">"
                 "<" -> "<"
@@ -287,9 +285,6 @@ fun BlockView(
         }
 
         is Staples -> {
-            val parts = inputValue.split("|", limit = 2)
-            val left = parts.getOrNull(0) ?: ""
-            val right = parts.getOrNull(1) ?: ""
             Box(
                 modifier = Modifier
                     .width(180.dp)
@@ -325,11 +320,12 @@ fun BlockView(
                         color = Color.White,
                         fontSize = 32.sp,
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(end = 2.dp,start = 10.dp)
+                        modifier = Modifier.padding(end = 2.dp, start = 10.dp)
                     )
                 }
             }
         }
+
         is IntVariable -> {
             Box(
                 modifier = Modifier
@@ -446,6 +442,7 @@ fun BlockView(
                 }
             }
         }
+
         is If -> {
             Box(
                 modifier = Modifier
@@ -475,6 +472,7 @@ fun BlockView(
                 }
             }
         }
+
         is IfElse -> {
             Box(
                 modifier = Modifier
@@ -504,6 +502,7 @@ fun BlockView(
                 }
             }
         }
+
         is While -> {
             Box(
                 modifier = Modifier
@@ -543,47 +542,111 @@ fun BlockView(
                     .background(Color(0xFF057CDE), RoundedCornerShape(6.dp))
                     .border(2.dp, Color.White, RoundedCornerShape(6.dp)),
                 contentAlignment = Alignment.Center
-            ) {
-                OutlinedTextField(
+            )
+            {
+                BasicTextField(
                     value = inputValue,
                     onValueChange = { newValue ->
-                        if (newValue.isEmpty() || newValue.all { it.isDigit() }) {
+                        if (newValue.all { ( it.isDigit()) }) {
                             onInputChange(newValue)
-
                         }
                     },
                     modifier = Modifier
-                        .fillMaxSize()
-                        .align(Alignment.Center),
+                        .padding(horizontal = 4.dp),
                     singleLine = true,
                     enabled = isInteractive,
-                    textStyle = androidx.compose.ui.text.TextStyle(
+                    textStyle = TextStyle(
                         fontSize = 25.sp,
-                        color = Color(0xFFD0D0D0),
-                        fontWeight = FontWeight.Normal,
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                        color = Color.White,
+                        textAlign = TextAlign.Center
                     ),
-                    placeholder = {
-                        Text(
-                            text = "0",
-                            color = Color(0xFFD0D0D0),
-                            fontSize = 25.sp,
-                            fontWeight = FontWeight.Normal,
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    },
-                    colors = androidx.compose.material3.TextFieldDefaults.outlinedTextFieldColors(
-                        containerColor = Color.Transparent,
-                        focusedBorderColor = Color.Transparent,
-                        unfocusedBorderColor = Color.Transparent,
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White,
-                        cursorColor = Color.White,
-                        disabledTextColor = Color.White,
-                        disabledBorderColor = Color.Transparent
-                    )
+                    cursorBrush = SolidColor(Color.White),
+                    decorationBox = { innerTextField ->
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            if (inputValue.isEmpty()) {
+                                Text(
+                                    text = "0",
+                                    color = Color(0xFFD0D0D0),
+                                    fontSize = 28.sp,
+                                    fontWeight = FontWeight.Normal
+                                )
+                            }
+                            innerTextField()//отображение
+                        }
+                    }
                 )
+            }
+        }
+
+        is Array -> {
+            Box(
+                modifier = Modifier
+                    .width(90.dp)
+                    .height(56.dp)
+                    .background(Color(0xFF057CDE), RoundedCornerShape(6.dp))
+                    .border(2.dp, Color.White, RoundedCornerShape(6.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "[",
+                        color = Color.White,
+                        fontSize = 25.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(start = 10.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    BasicTextField(
+                        value = inputValue,
+                        onValueChange = { newValue ->
+                            if (newValue.all { (it.isEnglishLetter() || it.isDigit()) }) {
+                                onInputChange(newValue)
+                            }
+                        },
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 4.dp),
+                        singleLine = true,
+                        enabled = isInteractive,
+                        textStyle = TextStyle(
+                            fontSize = 25.sp,
+                            color = Color.White,
+                            fontWeight = FontWeight.Normal,
+                            textAlign = TextAlign.Center
+                        ),
+                        cursorBrush = SolidColor(Color.White),
+                        decorationBox = { innerTextField ->
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier.fillMaxSize()
+                            ) {
+                                if (inputValue.isEmpty()) {
+                                    Text(
+                                        text = "0/x",
+                                        color = Color(0xFFD0D0D0),
+                                        fontSize = 25.sp,
+                                    )
+                                }
+                                innerTextField()
+                            }
+                        }
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "]",
+                        color = Color.White,
+                        fontSize = 25.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(end = 10.dp)
+                    )
+                }
             }
         }
 
@@ -592,49 +655,45 @@ fun BlockView(
                 modifier = Modifier
                     .width(55.dp)
                     .height(56.dp)
-                    .background(Color(0xFF35C1FE), RoundedCornerShape(cornerRadius))
-                    .border(2.dp, Color.White, RoundedCornerShape(cornerRadius))
-            ) {
-                OutlinedTextField(
+                    .background(Color(0xFF35C1FE), RoundedCornerShape(6.dp))
+                    .border(2.dp, Color.White, RoundedCornerShape(6.dp)),
+                contentAlignment = Alignment.Center
+            )
+            {  Spacer(modifier = Modifier.width(8.dp))
+
+                BasicTextField(
                     value = inputValue,
                     onValueChange = { newValue ->
-                        //  только английские буквы
-                        if (newValue.isEmpty() || newValue.all { it.isLetter() && it.isEnglishLetter() }) {
+                        if (newValue.all { (it.isEnglishLetter()) }) {
                             onInputChange(newValue)
                         }
                     },
                     modifier = Modifier
-                        .fillMaxSize()
-                        .height(56.dp),
-
+                        .padding(horizontal = 4.dp),
                     singleLine = true,
                     enabled = isInteractive,
-                    textStyle = androidx.compose.ui.text.TextStyle(
-                        fontSize = 18.sp,
-                        color = Color(0xFFFFFFFF),
-                        fontWeight = FontWeight.Normal,
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                    textStyle = TextStyle(
+                        fontSize = 25.sp,
+                        color = Color.White,
+                        textAlign = TextAlign.Center
                     ),
-                    placeholder = {
-                        Text(
-                            text = "X",
-                            color = Color(0xFFD0D0D0),
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Normal,
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    },
-                    colors = androidx.compose.material3.TextFieldDefaults.outlinedTextFieldColors(
-                        containerColor = Color.Transparent,
-                        focusedBorderColor = Color.Transparent,
-                        unfocusedBorderColor = Color.Transparent,
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White,
-                        cursorColor = Color.White,
-                        disabledTextColor = Color.White,
-                        disabledBorderColor = Color.Transparent
-                    )
+                    cursorBrush = SolidColor(Color.White),
+                    decorationBox = { innerTextField ->
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            if (inputValue.isEmpty()) {
+                                Text(
+                                    text = "X",
+                                    color = Color(0xFFD0D0D0),
+                                    fontSize = 28.sp,
+                                    fontWeight = FontWeight.Normal
+                                )
+                            }
+                            innerTextField()
+                        }
+                    }
                 )
             }
         }

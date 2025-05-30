@@ -51,7 +51,7 @@ fun ProjectScreen() {
     val checkButton by animateDpAsState(
         targetValue = if (blocksVisible) 300.dp else 0.dp
     )
-        // открыта закрыта панель блоков
+    // открыта закрыта панель блоков
 
 
     fun addBlockInOrder(block: Block) {
@@ -121,7 +121,7 @@ fun ProjectScreen() {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Button(
-                    onClick = {   },
+                    onClick = {   consoleInputText = "" },
                     modifier = Modifier
                         .padding(start = 16.dp)
                         .height(55.dp)
@@ -230,7 +230,7 @@ fun ProjectScreen() {
                     .clickable { if (!consoleVisible) blocksVisible = !blocksVisible }
             )
         }
-        var consoleInputText by remember { mutableStateOf("") }
+
         var cursorVisible by remember { mutableStateOf(true) }
         val cursorAlpha by animateFloatAsState(
             targetValue = if (cursorVisible) { 1f }

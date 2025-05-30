@@ -49,7 +49,7 @@ class ComparisonOperation(id: UUID, val text: String) :
     Block(id, Color(0xFFF89402)) {
     var left: List<Block> = emptyList()
     var right: List<Block> = emptyList()
-    }
+}
 
 class Assignment(id: UUID, val text: String = "x =") :
     Block(id, Color(0xFF71C94F)) {
@@ -82,7 +82,10 @@ class ConsoleWrite(id: UUID, val text: String = "console.write") :
     Block(id, Color(0xFF9A66FF)) {
     var elem: Block? = null
 }
-
+class Array(id: UUID, val text: String = "console.write") :
+    Block(id, Color(0xFF9A66FF)) {
+    var elem: Block? = null
+}
 
 @Composable
 fun BlockPanel(onBlockClick: (Block) -> Unit) {
@@ -109,8 +112,8 @@ fun BlockPanel(onBlockClick: (Block) -> Unit) {
         While(UUID.randomUUID()),
         ConsoleRead(UUID.randomUUID()) ,
         ConsoleWrite(UUID.randomUUID()),
-
-    )
+        Array(UUID.randomUUID())
+        )
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -122,7 +125,7 @@ fun BlockPanel(onBlockClick: (Block) -> Unit) {
     ) {
         val onRow = mutableListOf<Block>()
         blocks.forEach { block ->
-            if ( block is Const ||  block is Variable)
+            if ( block is Const ||  block is Variable ||  block is Array)
             {
                 onRow.add(block)
             }
@@ -167,10 +170,26 @@ fun BlockPanel(onBlockClick: (Block) -> Unit) {
                             isInteractive = false
                         )
                     }
+                    Spacer(
+                        modifier = Modifier
+                            .width(8.dp)
+                    )
+                    Box(
+                        modifier = Modifier
+                            .padding(vertical = 16.dp)
+                            .background(block.color, RoundedCornerShape(8.dp))
+                            .clickable { onBlockClick(onRow[2]) }
+                    ) {
+                        BlockView(
+                            block = onRow[2],
+                            onInputChange = {},
+                            isInteractive = false
+                        )
+                    }
                 }
             }
 
-            if (block !is Const && block !is Variable) {
+            if (block !is Const && block !is Variable && block !is Array) {
                 Box(
                     modifier = Modifier
                         .padding(vertical = 12.dp)
