@@ -204,7 +204,6 @@ fun BlockView(
                 }
             }
         }
-
         is ArithmeticOperation -> {
             Box(
                 modifier = Modifier
