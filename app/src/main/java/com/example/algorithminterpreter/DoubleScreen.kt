@@ -1,5 +1,8 @@
 package com.example.algorithminterpreter
 
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -62,19 +65,31 @@ fun ProjectScreen() {
     )
     // открыта закрыта панель блоков
 
+    var waitingForStartInput by remember { mutableStateOf(false) }
+    val inputQueue = remember { mutableStateListOf<String>() }  // очередь введённых строк
+    val code = "int x console.read x console.write x x = x + 1 console.write x int y console.read y console.write y "
+
     fun output(text: String) {
         consoleOutput.add(text)
     }
 
     fun startInterpreter() {
         try {
-            val code = "int x x = 5 while x > 0 console.write x x = x - 1 endwhile"
-
-
             val lexer = Lexer(code)
             lexer.lexAnalysis()
 
             val parser = Parser(lexer.tokens, ::output)
+
+            parser.getInput = {
+                while (inputQueue.isEmpty()) {
+
+                    kotlinx.coroutines.runBlocking {
+                        kotlinx.coroutines.delay(100)
+                    }
+                }
+                inputQueue.removeAt(0)
+            }
+
             val rootNode = parser.parseCode()
             parser.run(rootNode)
         } catch (e: Exception) {
@@ -149,7 +164,19 @@ fun ProjectScreen() {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Button(
-                    onClick = { startInterpreter() },
+                    onClick = {
+                        consoleOutput.clear()
+                        consoleInputText = ""
+
+                        if (code.contains("console.read")) {
+                            consoleVisible = true
+                            waitingForStartInput = true
+                        } else {
+                            inputQueue.clear()
+                            startInterpreter()
+                        }
+                        consoleInputText = ""
+                    },
                     modifier = Modifier
                         .padding(start = 16.dp)
                         .height(55.dp)
@@ -284,51 +311,75 @@ fun ProjectScreen() {
                     .align(Alignment.BottomCenter)
                     .background(Color(0xFF8685C7))
             ) {
-                BasicTextField(
-                    value = consoleInputText,
-                    onValueChange = { consoleInputText = it },
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 8.dp, vertical = 10.dp)
-                        .align(Alignment.TopCenter),
-                    textStyle = TextStyle(
-                        fontSize = 22.sp,
-                        color = Color.White,
-                        textAlign = TextAlign.Start,
-                        letterSpacing = 2.sp
-                    ),
-                    cursorBrush = SolidColor(Color.White.copy(alpha = cursorAlpha)),
-                    decorationBox = { innerTextField ->
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(start = 8.dp),
-                            contentAlignment = Alignment.TopStart
-                        ) {
-                            innerTextField()
-                            if (consoleInputText.isEmpty()) {
-                                Box(
-                                    modifier = Modifier
-                                        .width(2.dp)
-                                        .height(24.dp)
-                                        .background(Color.White.copy(alpha = cursorAlpha))
-                                )
+                        .align(Alignment.TopCenter)
+                ) {
+                    BasicTextField(
+                        value = consoleInputText,
+                        onValueChange = { consoleInputText = it },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 10.dp), // отступ вниз после ввода
+                        textStyle = TextStyle(
+                            fontSize = 22.sp,
+                            color = Color.White,
+                            textAlign = TextAlign.Start,
+                            letterSpacing = 2.sp
+                        ),
+                        cursorBrush = SolidColor(Color.White.copy(alpha = cursorAlpha)),
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            imeAction = ImeAction.Done
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = {
+                                val input = consoleInputText.trim()
+                                if (input.isNotEmpty() && waitingForStartInput) {
+                                    val inputs = input.split(Regex("\\s+"))
+                                    inputQueue.clear()
+                                    inputQueue.addAll(inputs)
+                                    // НЕ очищаем здесь, ждем нажатия Start
+                                    waitingForStartInput = false
+                                    startInterpreter()
+                                }
+                            }
+                        ),
+                        decorationBox = { innerTextField ->
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                contentAlignment = Alignment.TopStart
+                            ) {
+                                innerTextField()
+                                if (consoleInputText.isEmpty()) {
+                                    Box(
+                                        modifier = Modifier
+                                            .width(2.dp)
+                                            .height(24.dp)
+                                            .background(Color.White.copy(alpha = cursorAlpha))
+                                    )
+                                }
                             }
                         }
-                    }
-                )
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 70.dp, start = 8.dp, end = 8.dp, bottom = 10.dp)
-                ) {
-                    items(consoleOutput) { line ->
-                        Text(
-                            text = line,
-                            fontSize = 18.sp,
-                            color = Color.White,
-                            modifier = Modifier.padding(vertical = 2.dp)
-                        )
+                    )
+
+                    LazyColumn(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        items(consoleOutput) { line ->
+                            Text(
+                                text = line,
+                                fontSize = 22.sp,
+                                color = Color.White,
+                                textAlign = TextAlign.Start,
+                                letterSpacing = 2.sp,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 6.dp)
+                            )
+                        }
                     }
                 }
             }

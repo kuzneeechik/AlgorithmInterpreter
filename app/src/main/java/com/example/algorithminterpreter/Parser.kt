@@ -3,6 +3,7 @@ import com.example.algorithminterpreter.ast.*
 
 class Parser(private val tokens: List<Token>, private val output: (String) -> Unit)
 {
+    var getInput: () -> String = { "" }
     private var pos: Int = 0
     private var scope = mutableMapOf<String, Any>()
 
@@ -418,7 +419,8 @@ class Parser(private val tokens: List<Token>, private val output: (String) -> Un
                         output(result)
                     }
                     "READ" -> {
-                        val value = readln().toLongOrNull() ?: throw Exception("Incorrect input")
+                        val input = getInput() ?: throw Exception("Ввод не получен")
+                        val value = input.toLongOrNull() ?: throw Exception("Некорректное число: $input")
 
                         when (val currentNode = node.operand)
                         {
