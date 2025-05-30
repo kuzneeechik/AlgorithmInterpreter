@@ -4,18 +4,15 @@ class Lexer(private var code: String) {
     private var pos: Int = 0
     val tokens: MutableList<Token> = mutableListOf()
 
-    fun lexAnalysis()
-    {
+    fun lexAnalysis() {
         val codeLength: Int = code.length
 
-        while (nextToken(codeLength))
-        {
+        while (nextToken(codeLength)) {
             /* to do */
         }
     }
 
-    private fun nextToken(codeLength: Int): Boolean
-    {
+    private fun nextToken(codeLength: Int): Boolean {
         if (pos >= codeLength) {
             return false
         }
@@ -27,8 +24,7 @@ class Lexer(private var code: String) {
             val match = currentRegular.find(code)
             var result = ""
 
-            if (match != null)
-            {
+            if (match != null) {
                 val start = match.range.first
                 val end = match.range.last + 1
 
@@ -37,8 +33,7 @@ class Lexer(private var code: String) {
                 code = code.removeRange(start, end)
             }
 
-            if (result.isNotEmpty())
-            {
+            if (result.isNotEmpty()) {
                 val token = Token(currentType, result, pos)
                 tokens.add(token)
 
@@ -47,6 +42,6 @@ class Lexer(private var code: String) {
                 return true
             }
         }
-        throw Exception ("There is error on the position $pos")
+        throw Exception("There is error on the position $pos")
     }
 }

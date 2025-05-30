@@ -1,3 +1,146 @@
 <resources>
+    // fail Works...
     <string name="app_name">StepCode</string>
+    <string name="console_read">console.read</string>
+    <string name="console_write">console.write</string>
+    <string name="more">&gt;</string>
+    <string name="less">&lt;</string>
+    <string name="more_equal">&gt;=</string>
+    <string name="less_equal">&lt;=</string>
+    <string name="equal_equal">==</string>
+    <string name="not_equal">!=</string>
+    <string name="left_bracket">(</string>
+    <string name="right_bracket">)</string>
+    <string name="type_int">int</string>
+    <string name="left_bracket_square">[</string>
+    <string name="right_bracket_square">]</string>
+    <string name="equals">=</string>
+    <string name="type_if">if</string>
+    <string name="if_else">ifel</string>
+    <string name="type_while">while</string>
+    <string name="digit_zero">0</string>
+    <string name="text_name">name</string>
+    <string name="text_i">i</string>
+    <string name="text_x">X</string>
+    // TokenType
+    <string name="token_write">WRITE</string>
+    <string name="token_read">READ</string>
+    <string name="token_space">SPACE</string>
+    <string name="token_init">INIT</string>
+    <string name="token_if">IF</string>
+    <string name="token_else">ELSE</string>
+    <string name="token_endif">ENDIF</string>
+    <string name="token_equality">EQUALITY</string>
+    <string name="token_unequal">UNEQUAL</string>
+    <string name="token_um">UM</string>
+    <string name="token_ul">UL</string>
+    <string name="token_assign">ASSIGN</string>
+    <string name="token_more">MORE</string>
+    <string name="token_less">LESS</string>
+    <string name="token_plus">PLUS</string>
+    <string name="token_minus">MINUS</string>
+    <string name="token_multi">MULTI</string>
+    <string name="token_div">DIV</string>
+    <string name="token_mod">MOD</string>
+    <string name="token_left_par">LEFT PAR</string>
+    <string name="token_right_par">RIGHT PAR</string>
+    <string name="token_left_bracket">LEFT BRACKET</string>
+    <string name="token_right_bracket">RIGHT BRACKET</string>
+    <string name="token_number">NUMBER</string>
+    <string name="token_while">WHILE</string>
+    <string name="token_variable">VARIABLE</string>
+    <string name="token_endwhile">ENDWHILE</string>
+    <string name="regex_write">^console\.write</string>
+    <string name="regex_read">^console.read</string>
+    <string name="regex_space">^[ \n\t\r]+</string>
+    <string name="regex_init">^int</string>
+    <string name="regex_if">^if</string>
+    <string name="regex_else">^else</string>
+    <string name="regex_endif">^endif</string>
+    <string name="regex_equality">^==</string>
+    <string name="regex_unequal">^!=</string>
+    <string name="regex_um">^&gt;=</string>
+    <string name="regex_ul">^&lt;=</string>
+    <string name="regex_assign">^=</string>
+    <string name="regex_more">^&gt;</string>
+    <string name="regex_less">^&lt;</string>
+    <string name="regex_plus">^\+</string>
+    <string name="regex_minus">^-</string>
+    <string name="regex_multi">^\*</string>
+    <string name="regex_div">^/</string>
+    <string name="regex_mod">^%</string>
+    <string name="regex_left_par">^\(</string>
+    <string name="regex_right_par">^\)</string>
+    <string name="regex_left_bracket">^\[</string>
+    <string name="regex_right_bracket">^\]</string>
+    <string name="regex_number">^[0-9]+</string>
+    <string name="regex_while">^while</string>
+    <string name="regex_endwhile">^endwhile</string>
+    <string name="regex_variable">^[A-Za-z_][A-Za-z0-9_]*</string>
+    // Token
+    // Shape
+    // Parser
+    <string name="error_console_write">The \'console.write\' operator is expected in the position $pos</string>
+    <string name="error_console_read">The \'console.read\' operator is expected in the position $pos</string>
+    <string name="error_var_or_number">Variable or number is expected in the position $pos</string>
+    <string name="error_var_after_int">Variable name expected after \'int\'</string>
+    <string name="error_int_operator">"The 'int' operator is expected in the position $pos"</string>
+    <string name="error_assign_operator">"The 'assign' operator is expected in the position $pos"</string>
+    <string name="error_index_out_of_bounds">Index %1$d is out of bounds for array</string>
+    <string name="error_expected_array">Variable "%1$s" must be an array to use indexing</string>
+    <string name="error_left_side">Left side must be variable or array</string>
+    <string name="prompt_array_input">Enter value for %1$s[%2$d]</string>
+    <string name="error_incorrect_digit">Incorrect  digit: $input</string>
+    <string name="error_var_not_found">"The variable with name '${currentNode.variable.text}' not found"</string>
+    <string name="error_expected_token">%1$s is expected in the position %2$d</string>
+    <string name="error_operand_not_var_array">Operand for READ must be a variable or an array element</string>
+    <string name="error_var_not_found_2">The variable with name ${node.variable.text} not found</string>
+    <string name="error_array_size_positive">Array size must be positive</string>
+    <string name="error_not_array_var">"Variable '${currentNode.array.text}' is not an array"</string>
+    <string name="error_not_left_array_var">"Variable '${left.array.text}' is not an array"</string>
+    <string name="error_index_out_of_range">Index $index out of range</string>
+    <string name="error_endless_loop">An infinite loop has been started</string>
+    <string name="error_error">Error!</string>
+    //MainScreen
+    <string name="main_logo">Лого step code</string>
+    <string name="main_Start">Start</string>
+    <string name="main_верхняя">верхняя</string>
+    <string name="main_нижняя">нижняя</string>
+    //MainActivity
+    <string name="main_start">start</string>
+    <string name="main_project">project</string>
+    //Lexer
+    <string name="error_pos">There is error on the position $pos</string>
+    //DoubleScreen
+    <string name="input">Введите $variableName:</string>
+    <string name="error_occurred">Error occurred: ${e.message}</string>
+    <string name="blocks">Blocks</string>
+    <string name="step_code">StepCode</string>
+    <string name="clear">Clear</string>
+    <string name="console">Console</string>
+    <string name="whitespace_pattern">\s+</string>
+    //BlockToText
+    <string name="block_name_index">${block.name}[${block.index}]</string>
+    <string name="int_variable">int ${block.variable}</string>
+    <string name="int_array">int ${block.variable}[${block.size}]</string>
+    <string name="block_text">{block.text}</string>
+    <string name="elem_parentheses">($elem)</string>
+    <string name="assignment">$variable = $value</string>
+    <string name="if_condition_body">if $condition {$body}</string>
+    <string name="if_else_condition_body">if $condition {$ifBody} else {$elseBody}</string>
+    <string name="while_condition_body">while $condition {$body}</string>
+    <string name="console_read_elem">console.read $elem</string>
+    <string name="console_write_elem">console.write $elem</string>
+    <string name="unknown_block_type">Unknown block type: ${block.javaClass.simpleName}</string>
+    //BlockPanel
+    <string name="Block_int_array">int[]</string>
+    <string name="Block_x">x</string>
+    <string name="Block_console_read">console.read</string>
+    <string name="Block_console_write">console.write</string>
+    <string name="Block_plus">+</string>
+    <string name="Block_minus">-</string>
+    <string name="Block_mul">*</string>
+    <string name="Block_mod">%</string>
+    <string name="Block_div">/</string>
 </resources>
+

@@ -1,10 +1,8 @@
-
 import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
-
 
 
 @Composable
@@ -24,7 +22,10 @@ fun IntBlock(): Shape {
 
         moveTo(0f, 0f)
         lineTo(notchOffsetX * scaleX, 0f)
-        lineTo((notchOffsetX + notchWidth * 0.25f) * scaleX, notchHeight * scaleY) //левая точка выреза
+        lineTo(
+            (notchOffsetX + notchWidth * 0.25f) * scaleX,
+            notchHeight * scaleY
+        ) //левая точка выреза
         lineTo((notchOffsetX + notchWidth * 0.75f) * scaleX, notchHeight * scaleY)//правая
         lineTo((notchOffsetX + notchWidth) * scaleX, 0f)//конец выреза
         lineTo(width, 0f)//прсото линия сверху
@@ -68,6 +69,7 @@ fun IntBlockArray(): Shape {
         close()
     }
 }
+
 @Composable
 fun ConsoleReadBlocks(): Shape {
     val density = LocalDensity.current
@@ -98,6 +100,7 @@ fun ConsoleReadBlocks(): Shape {
         close()
     }
 }
+
 @Composable
 fun ConsoleWriteBlocks(): Shape {
     val density = LocalDensity.current
@@ -260,6 +263,7 @@ fun BlockIfElse(): Shape {
         close()
     }
 }
+
 @Composable
 fun BlockWhile(): Shape {
     val density = LocalDensity.current
