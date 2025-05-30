@@ -29,25 +29,18 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import kotlinx.coroutines.delay
+import java.util.UUID
 
-data class PositionedBlock(
-    val block: Block,
-    var position: Offset,
-    var inputValue: String = "",
-    val zIndex: Float = when (block) {
-        is Const, is Variable, is ArrayElem, is ArithmeticOperation -> 3f  //выше всех
-        is ComparisonOperation, is Staples, is IntVariable, is IntArray, is Assignment -> 2f
-        is If, is IfElse, is While, is ConsoleRead, is ConsoleWrite -> 1f
-        else -> 0f
-    }
-)
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProjectScreen() {
+    var blockWithDeleteShownId by remember { mutableStateOf<UUID?>(null) }
     val consoleOutput = remember { mutableStateListOf<String>() }
     var blocksVisible by remember { mutableStateOf(false) }
     var consoleVisible by remember { mutableStateOf(false) }
+    var menuForBlockOfBlock by remember { mutableStateOf(false) }
     val checkConsoleBord by animateDpAsState(
         targetValue = if (consoleVisible) (-298).dp else (0).dp //открывание закрывание консоли
     )
@@ -69,8 +62,6 @@ fun ProjectScreen() {
     fun startInterpreter() {
         try {
             val code = "int x x = 5 while x > 0 console.write x x = x - 1 endwhile"
-
-
             val lexer = Lexer(code)
             lexer.lexAnalysis()
 
@@ -89,12 +80,18 @@ fun ProjectScreen() {
 
     }
 
+
+    fun deleteBlock(id: UUID) {
+        workspaceBlocks.removeAll { it.block.id == id }
+        blockWithDeleteShownId = null
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFE0DDFF))
-    ) {
-
+    )
+    {
         FreeWorkspaceBlocksArea(
 
             blocks = workspaceBlocks,
@@ -103,7 +100,10 @@ fun ProjectScreen() {
             onBlockMove = { index, offset -> //обновляет позицию блока в списке при перетаскивании
                 val old = workspaceBlocks[index]
                 workspaceBlocks[index] = old.copy(position = old.position + offset)
-            }
+            },
+            menu = blocksVisible,
+            menuForBlockOfBlock = menuForBlockOfBlock,
+            changeMenuForBlockOfBlock = {menuForBlockOfBlock = !menuForBlockOfBlock }
         )
 
         Image(
@@ -115,9 +115,7 @@ fun ProjectScreen() {
                 .width(35.dp)
                 .height(150.dp)
                 .clickable { if (!consoleVisible)
-                {
-                    blocksVisible = !blocksVisible
-                } }
+                { blocksVisible = !blocksVisible } }
         )
 
         Row(
@@ -228,7 +226,7 @@ fun ProjectScreen() {
             )
         }
 
-        if (blocksVisible) {
+        if (blocksVisible || menuForBlockOfBlock) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -245,7 +243,9 @@ fun ProjectScreen() {
         ) {
             BlockPanel { block ->
                 addBlockInOrder(block)
-                blocksVisible = false
+                if(blocksVisible) blocksVisible = false
+                if(menuForBlockOfBlock) menuForBlockOfBlock = false
+
             }
             Image(
                 painter = painterResource(id = R.drawable.block),

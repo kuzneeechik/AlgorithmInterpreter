@@ -175,22 +175,61 @@ fun BlockIf(): Shape {
         val scaleX = width / blockWidth
         val scaleY = height / blockHeight
 
+        // Верхний пазл (основной блок if)
         moveTo(0f, 0f)
         lineTo(notchOffsetX * scaleX, 0f)
         lineTo((notchOffsetX + notchWidth * 0.25f) * scaleX, notchHeight * scaleY)
         lineTo((notchOffsetX + notchWidth * 0.75f) * scaleX, notchHeight * scaleY)
         lineTo((notchOffsetX + notchWidth) * scaleX, 0f)
         lineTo(width, 0f)
+        lineTo(width, height * 0.7f) // Оставляем место для нижнего пазла
+
+        // Нижний пазл (поменьше)
         lineTo(width, height)
         lineTo((notchOffsetX + notchWidth) * scaleX, height)
-        lineTo((notchOffsetX + notchWidth * 0.75f) * scaleX, height - -notchHeight * scaleY)
-        lineTo((notchOffsetX + notchWidth * 0.25f) * scaleX, height - -notchHeight * scaleY)
+        lineTo((notchOffsetX + notchWidth * 0.75f) * scaleX, height - notchHeight * scaleY)
+        lineTo((notchOffsetX + notchWidth * 0.25f) * scaleX, height - notchHeight * scaleY)
         lineTo(notchOffsetX * scaleX, height)
         lineTo(0f, height)
         close()
     }
 }
 
+@Composable
+fun BlockIfLower(): Shape {
+    val density = LocalDensity.current
+    val blockWidth = with(density) { 250.dp.toPx() }
+    val blockHeight = with(density) { 30.dp.toPx() } // Меньшая высота
+    val notchWidth = with(density) { 40.dp.toPx() }
+    val notchHeight = with(density) { 10.dp.toPx() }
+    val notchOffsetX = with(density) { 24.dp.toPx() }
+
+    return GenericShape { size, _ ->
+        val width = size.width
+        val height = size.height
+        val scaleX = width / blockWidth
+        val scaleY = height / blockHeight
+
+        // Верхний выступ (для соединения с основным блоком)
+        moveTo(0f, 0f)
+        lineTo(notchOffsetX * scaleX, 0f)
+        lineTo((notchOffsetX + notchWidth * 0.25f) * scaleX, -notchHeight * scaleY)
+        lineTo((notchOffsetX + notchWidth * 0.75f) * scaleX, -notchHeight * scaleY)
+        lineTo((notchOffsetX + notchWidth) * scaleX, 0f)
+
+        // Правая сторона
+        lineTo(width, 0f)
+        lineTo(width, height)
+
+        // Нижняя часть
+        lineTo((notchOffsetX + notchWidth) * scaleX, height)
+        lineTo((notchOffsetX + notchWidth * 0.75f) * scaleX, height + notchHeight * scaleY)
+        lineTo((notchOffsetX + notchWidth * 0.25f) * scaleX, height + notchHeight * scaleY)
+        lineTo(notchOffsetX * scaleX, height)
+        lineTo(0f, height)
+        close()
+    }
+}
 @Composable
 fun BlockIfElse(): Shape {
     val density = LocalDensity.current

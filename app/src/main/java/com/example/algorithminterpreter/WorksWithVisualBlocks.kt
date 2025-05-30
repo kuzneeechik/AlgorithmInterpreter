@@ -7,22 +7,35 @@ import ConsoleWriteBlocks
 import GreenAssignmentBlocks
 import IntBlock
 import IntBlockArray
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Create
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -46,6 +59,10 @@ import kotlin.math.roundToInt
 private fun Char.isEnglishLetter(): Boolean {
     return this in 'a'..'z' || this in 'A'..'Z'
 }
+
+
+
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FreeWorkspaceBlocksArea(
     blocks: MutableList<PositionedBlock>,
@@ -55,7 +72,10 @@ fun FreeWorkspaceBlocksArea(
     leftPanelWidth: Dp = 140.dp,
     topBoundaryDp: Dp = 90.dp,
     bottomBoundaryDp: Dp = 190.dp,
-    blockWidth: Dp = 270.dp
+    blockWidth: Dp = 270.dp,
+    menu : Boolean,
+    menuForBlockOfBlock: Boolean = false,
+    changeMenuForBlockOfBlock: ()-> Unit
 ) {
     var draggingIndex by remember { mutableStateOf<Int?>(null) }
     var dragOffset by remember { mutableStateOf(Offset.Zero) }
@@ -66,6 +86,17 @@ fun FreeWorkspaceBlocksArea(
     val topBoundaryPx = with(density) { topBoundaryDp.toPx() }
     val bottomBoundaryPx = with(density) { bottomBoundaryDp.toPx() }
     val halfBlockWidthPx = with(density) { blockWidth.toPx() / 2 }
+
+    var middle = remember {mutableStateListOf<PositionedBlock>()}
+    var currentBlockOfBlock by remember { mutableStateOf<BlocOfBlock?>(null) }
+
+
+    fun addBlock(blockIn: BlocOfBlock){
+        currentBlockOfBlock = blockIn
+        middle.clear()
+        middle.addAll(currentBlockOfBlock!!.blocks)
+        changeMenuForBlockOfBlock()
+    }
 
     Box(
         Modifier
@@ -84,10 +115,11 @@ fun FreeWorkspaceBlocksArea(
             when (it.block) {
                 is Const, is Variable, is ArrayElem, is ArithmeticOperation -> 3
                 is ComparisonOperation, is Staples, is IntVariable, is IntArray, is Assignment -> 2
-                is If, is IfElse, is While, is ConsoleRead, is ConsoleWrite -> 1
+                is If, is IfElse, is While, is ConsoleRead, is ConsoleWrite -> 1 // 3 ниже всех
                 else -> 0
             }
         }
+
         sortedBlocks.forEachIndexed { sortedIndex, positionedBlock ->
             val originalIndex = blocks.indexOf(positionedBlock)
             val isDragging = draggingIndex == originalIndex
@@ -96,7 +128,7 @@ fun FreeWorkspaceBlocksArea(
                 modifier = Modifier
                     .zIndex(
                         when {
-                            isDragging -> 10f // перетаскиваемый  ВСЕГДА сверху
+                            isDragging -> 10f // перетаскиваемый всегда сверху
                             positionedBlock.block is Const || positionedBlock.block is Variable ||
                                     positionedBlock.block is ArrayElem || positionedBlock.block is ArithmeticOperation -> 3f
                             positionedBlock.block is ComparisonOperation || positionedBlock.block is Staples ||
@@ -150,23 +182,26 @@ fun FreeWorkspaceBlocksArea(
             ) {
                 BlockView(
                     block = positionedBlock.block,
-                    inputValue = positionedBlock.inputValue,
-                    onInputChange = { newValue ->
-                        blocks[originalIndex] = positionedBlock.copy(inputValue = newValue)
-                    }
+                    onClick = {},
+                    menu = menu,
+                    onInputChange = { blocks[originalIndex] = positionedBlock.copy() },
+                    onSwapMenu = {blockOfBlock -> addBlock(blockOfBlock)}
                 )
             }
         }
     }
 }
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun BlockView(
     block: Block,
-    inputValue: String = "",
     isInteractive: Boolean = true,
+    menu : Boolean = true,
+    onClick: ()-> Unit,
     onInputChange: (String) -> Unit = {},
+    onSwapMenu: (BlocOfBlock)-> Unit
 ) {
+    val density = LocalDensity.current
     val cornerRadius = 6.dp
     when (block) {
         is ConsoleRead -> {
@@ -217,46 +252,23 @@ fun BlockView(
                         fontWeight = FontWeight.Normal,
                         textAlign = TextAlign.Start
                     )
-                    Box(
+                    BasicTextField(
+                        value = block.elem,
+                        onValueChange = { block.elem = it },
                         modifier = Modifier
-                            .width(56.dp)
-                            .height(57.dp)
-                            .border(2.dp, Color.White, RoundedCornerShape(8.dp))
+                            .padding(horizontal = 4.dp),
+                        singleLine = true,
+                        enabled = isInteractive,
+                        textStyle = TextStyle(
+                            fontSize = 25.sp,
+                            color = Color.White,
+                            textAlign = TextAlign.Center
+                        ),
+                        cursorBrush = SolidColor(Color.White),
                     )
                 }
             }
         }
-        is ArithmeticOperation -> {
-            Box(
-                modifier = Modifier
-                    .width(55.dp)
-                    .height(56.dp)
-                    .background(block.color, RoundedCornerShape(cornerRadius))
-                    .border(2.dp, Color.White, RoundedCornerShape(cornerRadius))
-                    .padding(8.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Start,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(start = 10.dp, end = 5.dp)
-
-                ) {
-                    Text(
-                        text = block.text,
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 27.sp,
-                        modifier = Modifier
-
-
-                    )
-                }
-            }
-        }
-
         is ComparisonOperation -> {
             val operator = when (block.text) {
                 ">" -> ">"
@@ -280,12 +292,21 @@ fun BlockView(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    Box(
+                    BasicTextField(
+                        value = block.left,
+                        onValueChange = { block.left = it },
                         modifier = Modifier
-                            .width(56.dp)
-                            .height(57.dp)
-                            .border(2.dp, Color.White, RoundedCornerShape(8.dp))
-                    ) { }
+                            .padding(horizontal = 4.dp),
+                        singleLine = true,
+                        enabled = isInteractive,
+                        textStyle = TextStyle(
+                            fontSize = 25.sp,
+                            color = Color.White,
+                            textAlign = TextAlign.Center
+                        ),
+                        cursorBrush = SolidColor(Color.White),
+                    )
+
                     Text(
                         text = operator,
                         color = Color.White,
@@ -293,12 +314,22 @@ fun BlockView(
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(horizontal = 8.dp)
                     )
-                    Box(
+
+                    BasicTextField(
+                        value = block.right,
+                        onValueChange = { block.right = it
+                        },
                         modifier = Modifier
-                            .width(56.dp)
-                            .height(57.dp)
-                            .border(2.dp, Color.White, RoundedCornerShape(8.dp))
-                    ) { }
+                            .padding(horizontal = 4.dp),
+                        singleLine = true,
+                        enabled = isInteractive,
+                        textStyle = TextStyle(
+                            fontSize = 25.sp,
+                            color = Color.White,
+                            textAlign = TextAlign.Center
+                        ),
+                        cursorBrush = SolidColor(Color.White),
+                    )
 
                 }
             }
@@ -328,12 +359,20 @@ fun BlockView(
                             .padding(end = 10.dp, start = 2.dp)
                     )
 
-                    Box(
+                    BasicTextField(
+                        value = block.elem,
+                        onValueChange = { block.elem = it },
                         modifier = Modifier
-                            .width(120.dp)
-                            .height(57.dp)
-                            .border(2.dp, Color.White, RoundedCornerShape(8.dp))
-                    ) { }
+                            .padding(horizontal = 4.dp),
+                        singleLine = true,
+                        enabled = isInteractive,
+                        textStyle = TextStyle(
+                            fontSize = 25.sp,
+                            color = Color.White,
+                            textAlign = TextAlign.Center
+                        ),
+                        cursorBrush = SolidColor(Color.White),
+                    )
 
                     Text(
                         text = ")",
@@ -365,11 +404,19 @@ fun BlockView(
                         fontWeight = FontWeight.Normal,
                         textAlign = TextAlign.Start
                     )
-                    Box(
+                    BasicTextField(
+                        value = block.variable,
+                        onValueChange = { block.variable = it },
                         modifier = Modifier
-                            .width(56.dp)
-                            .height(57.dp)
-                            .border(2.dp, Color.White, RoundedCornerShape(8.dp))
+                            .padding(horizontal = 4.dp),
+                        singleLine = true,
+                        enabled = isInteractive,
+                        textStyle = TextStyle(
+                            fontSize = 25.sp,
+                            color = Color.White,
+                            textAlign = TextAlign.Center
+                        ),
+                        cursorBrush = SolidColor(Color.White),
                     )
                 }
             }
@@ -398,11 +445,19 @@ fun BlockView(
                         fontWeight = FontWeight.Normal,
                         textAlign = TextAlign.Start
                     )
-                    Box(
+                    BasicTextField(
+                        value = block.variable,
+                        onValueChange = { block.variable = it },
                         modifier = Modifier
-                            .width(56.dp)
-                            .height(57.dp)
-                            .border(2.dp, Color.White, RoundedCornerShape(8.dp))
+                            .padding(horizontal = 4.dp),
+                        singleLine = true,
+                        enabled = isInteractive,
+                        textStyle = TextStyle(
+                            fontSize = 25.sp,
+                            color = Color.White,
+                            textAlign = TextAlign.Center
+                        ),
+                        cursorBrush = SolidColor(Color.White),
                     )
                     Spacer(modifier = Modifier.width(5.dp))
                     Text(
@@ -412,11 +467,19 @@ fun BlockView(
                         fontWeight = FontWeight.Normal,
                         textAlign = TextAlign.Start
                     )
-                    Box(
+                    BasicTextField(
+                        value = block.size,
+                        onValueChange = { block.size = it },
                         modifier = Modifier
-                            .width(56.dp)
-                            .height(57.dp)
-                            .border(2.dp, Color.White, RoundedCornerShape(8.dp))
+                            .padding(horizontal = 4.dp),
+                        singleLine = true,
+                        enabled = isInteractive,
+                        textStyle = TextStyle(
+                            fontSize = 25.sp,
+                            color = Color.White,
+                            textAlign = TextAlign.Center
+                        ),
+                        cursorBrush = SolidColor(Color.White),
                     )
                     Text(
                         text = "]",
@@ -443,13 +506,20 @@ fun BlockView(
                     horizontalArrangement = Arrangement.Center,
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    Box(
+                    BasicTextField(
+                        value = block.variable,
+                        onValueChange = { block.variable = it },
                         modifier = Modifier
-                            .width(56.dp)
-                            .height(57.dp)
-                            .background(Color(0xFF35C1FE), RoundedCornerShape(8.dp))
-                            .border(2.dp, Color.White, RoundedCornerShape(8.dp))
-                    ) { }
+                            .padding(horizontal = 4.dp),
+                        singleLine = true,
+                        enabled = isInteractive,
+                        textStyle = TextStyle(
+                            fontSize = 25.sp,
+                            color = Color.White,
+                            textAlign = TextAlign.Center
+                        ),
+                        cursorBrush = SolidColor(Color.White),
+                    )
                     Text(
                         text = "=",
                         color = Color.White,
@@ -457,12 +527,20 @@ fun BlockView(
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(horizontal = 8.dp)
                     )
-                    Box(
+                    BasicTextField(
+                        value = block.value,
+                        onValueChange = { block.value = it },
                         modifier = Modifier
-                            .width(56.dp)
-                            .height(57.dp)
-                            .border(2.dp, Color.White, RoundedCornerShape(8.dp))
-                    ) { }
+                            .padding(horizontal = 4.dp),
+                        singleLine = true,
+                        enabled = isInteractive,
+                        textStyle = TextStyle(
+                            fontSize = 25.sp,
+                            color = Color.White,
+                            textAlign = TextAlign.Center
+                        ),
+                        cursorBrush = SolidColor(Color.White),
+                    )
                 }
             }
         }
@@ -470,29 +548,98 @@ fun BlockView(
         is If -> {
             Box(
                 modifier = Modifier
+                    .padding(16.dp)
                     .background(shape = BlockIf(), color = Color(0xFFFFAD19))
-                    .width(250.dp)
-                    .height(95.dp),
+                    .height(block.getHeightInDp(density))
+                    .width(block.getWidthInDp(density))
+                    .defaultMinSize(minHeight = 95.dp, minWidth = 190.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                Column(
+                    modifier = Modifier
+                        .wrapContentWidth()
+                        .wrapContentHeight()
+                        .padding(BaseVal.ColumnPadding),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text(
-                        text = "if",
-                        color = Color.White,
-                        fontSize = 32.sp,
-                        fontWeight = FontWeight.Normal,
-                        textAlign = TextAlign.Start
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(BaseVal.ColumnHorizontalArrangement),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "if",
+                            color = Color.White,
+                            fontSize = 26.sp,
+                            fontWeight = FontWeight.Medium,
+                            fontFamily = TomorrowFont,
+                        )
+                        OutlinedTextField(
+                            value = block.condition,
+                            onValueChange = {
+                                block.condition = it
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth(0.7f)
+                                .height(56.dp),
+                            enabled = !menu,
+                            singleLine = true,
+                        )
+                    }
+
                     Box(
                         modifier = Modifier
-                            .width(150.dp)
-                            .height(57.dp)
-                            .border(2.dp, Color.White, RoundedCornerShape(8.dp))
-                    )
+                            .padding(
+                                horizontal = BaseVal.BlockHorizontalPadding,
+                                vertical = BaseVal.BlockVerticalPadding
+                            )
+                            .defaultMinSize(minHeight = 80.dp, minWidth = 252.dp)
+                            .height(block.blocksInIf.getHeightInDp(density))
+                            .width(block.blocksInIf.getWidthInDp(density))
+                            .background(
+                                color = Color.White.copy(alpha = 0.2f),
+                                shape = RoundedCornerShape(16.dp)
+                            )
+                            .border(
+                                width = 2.dp,
+                                color = Color.White.copy(alpha = 0.5f),
+                                shape = RoundedCornerShape(16.dp)
+                            )
+                    ) {
+                        block.blocksInIf.blocks.forEach { blockInner ->
+                            FreeWorkspaceBlocksArea(
+                                blocks = block.blocksInIf.blocks,
+                                selectedBlock = null,
+                                onWorkspaceClick = {},
+                                onBlockMove = { index, offset ->
+                                    val old = block.blocksInIf.blocks[index]
+                                    block.blocksInIf.blocks[index] = old.copy(position = old.position + offset)
+                                },
+                                menu = menu,
+                                changeMenuForBlockOfBlock = {}
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(10.dp))
+                    }
+
+                    Button(
+                        onClick = {
+                            if (!menu) {
+                                onSwapMenu(block.blocksInIf)
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF0C0B0C),
+                            contentColor = Color.White
+                        ),
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Icon(Icons.Outlined.Create, contentDescription = null)
+                        }
+                    }
                 }
             }
         }
@@ -510,19 +657,66 @@ fun BlockView(
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     Text(
-                        text = "ifel",
+                        text = "else",
                         color = Color.White,
                         fontSize = 32.sp,
                         fontWeight = FontWeight.Normal,
                         textAlign = TextAlign.Start
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Box(
-                        modifier = Modifier
-                            .width(150.dp)
-                            .height(57.dp)
-                            .border(2.dp, Color.White, RoundedCornerShape(8.dp))
-                    )
+                }
+                Box(
+                    modifier = Modifier
+                        .padding(
+                            horizontal = BaseVal.BlockHorizontalPadding,
+                            vertical = BaseVal.BlockVerticalPadding
+                        )
+                        .defaultMinSize(minHeight = 80.dp, minWidth = 252.dp)
+                        .height(block.inBlock.getHeightInDp(density))
+                        .width(block.inBlock.getWidthInDp(density))
+                        .background(
+                            color = Color.White.copy(alpha = 0.2f),
+                            shape = RoundedCornerShape(16.dp)
+                        )
+                        .border(
+                            width = 2.dp,
+                            color = Color.White.copy(alpha = 0.5f),
+                            shape = RoundedCornerShape(16.dp)
+                        )
+                ) {
+                    block.inBlock.blocks.forEach { blockInner ->
+                        FreeWorkspaceBlocksArea(
+                            blocks = block.inBlock.blocks,
+                            selectedBlock = null,
+                            onWorkspaceClick = {},
+                            onBlockMove = { index, offset ->
+                                val old = block.inBlock.blocks[index]
+                                block.inBlock.blocks[index] = old.copy(position = old.position + offset)
+                            },
+                            menu = menu,
+                            changeMenuForBlockOfBlock = {}
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+
+                Button(
+                    onClick = {
+                        if (!menu) {
+                            onSwapMenu(block.inBlock)
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF000000),
+                        contentColor = Color.White
+                    ),
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Icon(Icons.Outlined.Add, contentDescription = null)
+                    }
                 }
             }
         }
@@ -531,84 +725,128 @@ fun BlockView(
             Box(
                 modifier = Modifier
                     .background(shape = BlockWhile(), color = Color(0xFFFF5755))
-                    .width(250.dp)
-                    .height(95.dp),
+                    .width(block.getWidthInDp(density))
+                    .height(block.getHeightInDp(density)),
                 contentAlignment = Alignment.Center
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    Text(
-                        text = "while",
-                        color = Color.White,
-                        fontSize = 32.sp,
-                        fontWeight = FontWeight.Normal,
-                        textAlign = TextAlign.Start
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Box(
-                        modifier = Modifier
-                            .width(115.dp)
-                            .height(57.dp)
-                            .border(2.dp, Color.White, RoundedCornerShape(8.dp))
-                    )
-                }
-            }
-        }
-
-        is Const -> {
-
-            Box(
-                modifier = Modifier
-                    .width(55.dp)
-                    .height(56.dp)
-                    .background(Color(0xFF057CDE), RoundedCornerShape(6.dp))
-                    .border(2.dp, Color.White, RoundedCornerShape(6.dp)),
-                contentAlignment = Alignment.Center
-            )
-            {
-                BasicTextField(
-                    value = inputValue,
-                    onValueChange = { newValue ->
-                        if (newValue.all { ( it.isDigit()) }) {
-                            onInputChange(newValue)
-                        }
-                    },
+                Column(
                     modifier = Modifier
-                        .padding(horizontal = 4.dp),
-                    singleLine = true,
-                    enabled = isInteractive,
-                    textStyle = TextStyle(
-                        fontSize = 25.sp,
-                        color = Color.White,
-                        textAlign = TextAlign.Center
-                    ),
-                    cursorBrush = SolidColor(Color.White),
-                    decorationBox = { innerTextField ->
-                        Box(
-                            contentAlignment = Alignment.Center,
-                            modifier = Modifier.fillMaxSize()
+                        .wrapContentWidth()
+                        .padding(BaseVal.ColumnPadding),
+                    verticalArrangement = Arrangement.spacedBy(BaseVal.ColumnVerticalArrangement)
+                ) {
+                    Row(
+                        modifier = Modifier.wrapContentWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(BaseVal.WhileBlock.horizontalArrangement),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "while",
+                            color = Color.White,
+                            fontSize = 26.sp,
+                            fontWeight = FontWeight.Medium,
+                            fontFamily = TomorrowFont,
+                            modifier = Modifier.width(BaseVal.WhileBlock.labelWidth)
+                        )
+
+                        Text(
+                            text = "(",
+                            color = Color.White,
+                            fontSize = 26.sp,
+                            fontWeight = FontWeight.Medium,
+                            fontFamily = TomorrowFont,
+                            modifier = Modifier.width(4.dp)
+                        )
+
+                        OutlinedTextField(
+                            value = block.condition,
+                            onValueChange = { block.condition = it },
+                            modifier = Modifier
+                                .width(BaseVal.WhileBlock.inputTextFieldWidth)
+                                .height(BaseVal.WhileBlock.inputTextFieldHeight),
+                            enabled = !menu,
+                            singleLine = true,
+                            textStyle = TextStyle(
+                                fontSize = 16.sp,
+                                fontFamily = TomorrowFont
+                            )
+                        )
+
+                        Text(
+                            text = ")",
+                            color = Color.White,
+                            fontSize = 26.sp,
+                            fontWeight = FontWeight.Medium,
+                            fontFamily = TomorrowFont,
+                            modifier = Modifier.width(4.dp)
+                        )
+
+                        Button(
+                            onClick = {
+                                if (!menu) {
+                                    onSwapMenu(block.inBlocks)
+                                }
+                            }, colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF7943DE), contentColor = Color.White
+                            ), modifier = Modifier.width(BaseVal.addBlockButtonWidth)
                         ) {
-                            if (inputValue.isEmpty()) {
-                                Text(
-                                    text = "0",
-                                    color = Color(0xFFD0D0D0),
-                                    fontSize = 28.sp,
-                                    fontWeight = FontWeight.Normal
-                                )
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Icon(Icons.Outlined.Add, contentDescription = null)
                             }
-                            innerTextField()//отображение
                         }
                     }
-                )
+
+                    Box(
+                        modifier = Modifier
+                            .padding(
+                                horizontal = BaseVal.BlockHorizontalPadding,
+                                vertical = BaseVal.BlockVerticalPadding
+                            )
+                            .defaultMinSize(
+                                minHeight = BaseVal.BlockHeight,
+                                minWidth = BaseVal.BlockWidth
+                            )
+                            .height(block.inBlocks.getHeightInDp(density))
+                            .width(block.inBlocks.getWidthInDp(density))
+                            .clickable { innerBlockWithDeleteShownId = null }
+                            .background(
+                                color = Color.White.copy(alpha = BaseVal.bodyBlockTransparencyIndex),
+                                shape = RoundedCornerShape(BaseVal.roundCornerShape)
+                            )
+                            .border(
+                                width = BaseVal.borderWidth,
+                                color = Color.White.copy(alpha = BaseVal.borderTransparencyIndex),
+                                shape = RoundedCornerShape(BaseVal.roundCornerShape)
+                            )) {
+                        block.inBlocks.blocks.forEach { blockInner ->
+                            key(blockInner.block.id) {
+                                FreeWorkspaceBlocksArea(
+                                    blocks = block.inBlocks.blocks,
+                                    selectedBlock = null,
+                                    onWorkspaceClick = {},
+                                    onBlockMove = { index, offset ->
+                                        val old = block.inBlocks.blocks[index]
+                                        block.inBlocks.blocks[index] = old.copy(position = old.position + offset)
+                                    },
+                                    menu = menu,
+                                    changeMenuForBlockOfBlock = {}
+                                )
+                            }
+
+                        }
+                        Spacer(modifier = Modifier.height(BaseVal.standardSpacerHeight))
+                    }
+                }
             }
         }
 
         is ArrayElem -> {
             Box(
                 modifier = Modifier
-                    .width(140.dp)
+                    .width(150.dp)
                     .height(56.dp)
                     .background(Color(0xFF35C1FE), RoundedCornerShape(6.dp))
                     .border(2.dp, Color.White, RoundedCornerShape(6.dp)),
@@ -624,7 +862,6 @@ fun BlockView(
                         onValueChange = { newName ->
                             if (isInteractive && newName.all { it.isLetter() }) {
                                 block.name = newName
-                                onInputChange("${newName}[${block.index}]")
                             }
                         },
                         modifier = Modifier
@@ -667,7 +904,6 @@ fun BlockView(
                         onValueChange = { newIndex ->
                             if (isInteractive && newIndex.all { it.isEnglishLetter() || it.isDigit() }) {
                                 block.index = newIndex
-                                onInputChange("${block.name}[${newIndex}]")
                             }
                         },
                         modifier = Modifier
@@ -709,56 +945,6 @@ fun BlockView(
                         modifier = Modifier.padding(end = 8.dp)
                     )
                 }
-            }
-        }
-
-
-
-        is Variable -> {
-            Box(
-                modifier = Modifier
-                    .width(55.dp)
-                    .height(56.dp)
-                    .background(Color(0xFF35C1FE), RoundedCornerShape(6.dp))
-                    .border(2.dp, Color.White, RoundedCornerShape(6.dp)),
-                contentAlignment = Alignment.Center
-            )
-            {  Spacer(modifier = Modifier.width(8.dp))
-
-                BasicTextField(
-                    value = inputValue,
-                    onValueChange = { newValue ->
-                        if (newValue.all { (it.isEnglishLetter()) }) {
-                            onInputChange(newValue)
-                        }
-                    },
-                    modifier = Modifier
-                        .padding(horizontal = 4.dp),
-                    singleLine = true,
-                    enabled = isInteractive,
-                    textStyle = TextStyle(
-                        fontSize = 25.sp,
-                        color = Color.White,
-                        textAlign = TextAlign.Center
-                    ),
-                    cursorBrush = SolidColor(Color.White),
-                    decorationBox = { innerTextField ->
-                        Box(
-                            contentAlignment = Alignment.Center,
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-                            if (inputValue.isEmpty()) {
-                                Text(
-                                    text = "X",
-                                    color = Color(0xFFD0D0D0),
-                                    fontSize = 28.sp,
-                                    fontWeight = FontWeight.Normal
-                                )
-                            }
-                            innerTextField()
-                        }
-                    }
-                )
             }
         }
     }
