@@ -53,10 +53,10 @@ fun ProjectScreen() {
     var consoleInputText by remember { mutableStateOf("") } //сохранение текста введенного в консоль
 
     val check by animateDpAsState(
-        targetValue = if (blocksVisible) 0.dp else (-300).dp
+        targetValue = if (blocksVisible || menuForBlockOfBlock) 0.dp else (-300).dp
     )
     val checkButton by animateDpAsState(
-        targetValue = if (blocksVisible) 300.dp else 0.dp
+        targetValue = if (blocksVisible || menuForBlockOfBlock) 300.dp else 0.dp
     )
     // открыта закрыта панель блоков
 
@@ -298,7 +298,11 @@ fun ProjectScreen() {
                 modifier = Modifier
                     .fillMaxSize()
                     .background(Color(0xAA868599))
-                    .clickable { blocksVisible = false }
+                    .clickable {
+                        if(blocksVisible) blocksVisible = false
+                        if(menuForBlockOfBlock) menuForBlockOfBlock = false
+                    }
+
             )
         }
         Box(
