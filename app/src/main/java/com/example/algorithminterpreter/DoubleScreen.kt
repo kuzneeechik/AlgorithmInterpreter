@@ -39,35 +39,57 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import kotlinx.coroutines.delay
 
+data class PositionedBlock(
+    val block: Block,
+    var position: Offset,
+    var inputValue: String = ""
+)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProjectScreen() {
-    val consoleOutput = remember { mutableStateListOf<String>() }
     var blocksVisible by remember { mutableStateOf(false) }
     var consoleVisible by remember { mutableStateOf(false) }
-    var menuForBlockOfBlock by remember { mutableStateOf(false) }
     val checkConsoleBord by animateDpAsState(
         targetValue = if (consoleVisible) (-298).dp else (0).dp //открывание закрывание консоли
     )
-    var workspaceBlocks = remember { mutableStateListOf<PositionedBlock>() } //изм блоков
+    var workspaceBlocks = remember { mutableStateListOf<PositionedBlock>()} //изм блоков
     var consoleInputText by remember { mutableStateOf("") } //сохранение текста введенного в консоль
 
     val check by animateDpAsState(
-        targetValue = if (blocksVisible || menuForBlockOfBlock) 0.dp else (-300).dp
+        targetValue = if (blocksVisible) 0.dp else (-300).dp
     )
     val checkButton by animateDpAsState(
-        targetValue = if (blocksVisible || menuForBlockOfBlock) 300.dp else 0.dp
+        targetValue = if (blocksVisible) 300.dp else 0.dp
     )
     // открыта закрыта панель блоков
+
 
     var inputContinuation: Continuation<String>? by remember { mutableStateOf(null) }
     var waitingForStartInput by remember { mutableStateOf(false) }
     val inputQueue = remember { mutableStateListOf<String>() }  // очередь введённых строк
     var currentPrompt by remember { mutableStateOf<String?>(null) }
-
-    val converter = BlockToText()
-    workspaceBlocks.sortBy { it.position.y }
-    val code = converter.convertBlocksToCode(workspaceBlocks.map { it.block })
+    var consoleOutput =  remember { mutableStateListOf<String>()}
+    val code = "int n " +
+            "n = 7 " +
+            "int mas[n] " +
+            "int i " +
+            "while i < n " +
+            "console.read mas[i] " +
+            "i = i + 1 endwhile " +
+            "int j " +
+            "int k " +
+            "int b " +
+            "while j < n " +
+            "k = 0 " +
+            "while k < n - 1 " +
+            "if mas[k] > mas[k + 1] " +
+            "b = mas[k] " +
+            "mas[k] = mas[k + 1] " +
+            "mas[k + 1] = b endif k = k + 1 endwhile j = j + 1 endwhile " +
+            "i = 0 " +
+            "while i < n " +
+            "console.write mas[i] i = i + 1 endwhile"
 
     fun output(text: String) {
         consoleOutput.add(text)
@@ -115,37 +137,29 @@ fun ProjectScreen() {
             repeatMode = RepeatMode.Reverse //это то что повтор
         )
     )
-// это запуск мигания
-    LaunchedEffect(Unit) {
-        while (true) {
-            delay(500)
-            cursorVisible = !cursorVisible
-        }
-    }
 
     fun addBlockInOrder(block: Block) {
         val baseX = 400f
         val arrayBlocks = workspaceBlocks.size+ 1
-        workspaceBlocks.add(PositionedBlock(block, Offset(baseX, 400f), ""))
+        workspaceBlocks.add(PositionedBlock(block, Offset(baseX, 100f* arrayBlocks), ""))
 
     }
-    var scroll = rememberScrollState()
+
     Box(
         modifier = Modifier
-            .verticalScroll(scroll)
+            .fillMaxSize()
             .background(Color(0xFFE0DDFF))
-            .height(800.dp)
     ) {
+
         FreeWorkspaceBlocksArea(
+
             blocks = workspaceBlocks,
             selectedBlock = null,
             onWorkspaceClick = {},
-            onBlockMove = { index, offset ->
+            onBlockMove = { index, offset -> //обновляет позицию блока в списке при перетаскивании
                 val old = workspaceBlocks[index]
                 workspaceBlocks[index] = old.copy(position = old.position + offset)
-            },
-            changeMenuForBlockOfBlock = {menuForBlockOfBlock = !menuForBlockOfBlock},
-            menu = menuForBlockOfBlock
+            }
         )
 
         Image(
@@ -276,16 +290,13 @@ fun ProjectScreen() {
                     .clickable { consoleVisible = !consoleVisible }
             )
         }
-        if (blocksVisible || menuForBlockOfBlock) {
+
+        if (blocksVisible) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(Color(0xAA868599))
-                    .clickable {
-                        if(blocksVisible) blocksVisible = false
-                        if(menuForBlockOfBlock) menuForBlockOfBlock = false
-                    }
-
+                    .clickable { blocksVisible = false }
             )
         }
         Box(
@@ -297,8 +308,7 @@ fun ProjectScreen() {
         ) {
             BlockPanel { block ->
                 addBlockInOrder(block)
-                if(blocksVisible) blocksVisible = false
-                if(menuForBlockOfBlock) menuForBlockOfBlock = false
+                blocksVisible = false
             }
             Image(
                 painter = painterResource(id = R.drawable.block),
@@ -312,7 +322,22 @@ fun ProjectScreen() {
             )
         }
 
-
+        var cursorVisible by remember { mutableStateOf(true) }
+        val cursorAlpha by animateFloatAsState(
+            targetValue = if (cursorVisible) { 1f }
+            else {0f}, //(видим/невидим)
+            animationSpec = infiniteRepeatable(
+                animation = tween(500),
+                repeatMode = RepeatMode.Reverse //это то что повтор
+            )
+        )
+// это запуск мигания
+        LaunchedEffect(Unit) {
+            while (true) {
+                delay(500)
+                cursorVisible = !cursorVisible
+            }
+        }
         if (consoleVisible) {
             Box(
                 modifier = Modifier
@@ -385,7 +410,6 @@ fun ProjectScreen() {
                             }
                         }
                     )
-
                     LazyColumn(
                         modifier = Modifier.fillMaxWidth()
                     ) {
@@ -406,7 +430,7 @@ fun ProjectScreen() {
             }
         }
 
-        if (consoleVisible)
+        if (consoleVisible )
         {
             Box(
                 modifier = Modifier

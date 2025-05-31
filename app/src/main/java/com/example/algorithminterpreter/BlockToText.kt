@@ -1,4 +1,4 @@
-package com.example.algorithminterpreter
+/*package com.example.algorithminterpreter
 
 class BlockToText {
     fun convertBlockToText(block: Block): String {
@@ -50,4 +50,4 @@ class BlockToText {
     fun convertBlocksToCode(blocks: List<Block>): String {
         return blocks.joinToString { convertBlockToText(it) }
     }
-} 
+} */
