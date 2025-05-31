@@ -65,26 +65,9 @@ fun ProjectScreen() {
     val inputQueue = remember { mutableStateListOf<String>() }  // очередь введённых строк
     var currentPrompt by remember { mutableStateOf<String?>(null) }
 
-    val code = "int n " +
-            "n = 7 " +
-            "int mas[n] " +
-            "int i " +
-            "while i < n " +
-            "console.read mas[i] " +
-            "i = i + 1 endwhile " +
-            "int j " +
-            "int k " +
-            "int b " +
-            "while j < n " +
-            "k = 0 " +
-            "while k < n - 1 " +
-            "if mas[k] > mas[k + 1] " +
-            "b = mas[k] " +
-            "mas[k] = mas[k + 1] " +
-            "mas[k + 1] = b endif k = k + 1 endwhile j = j + 1 endwhile " +
-            "i = 0 " +
-            "while i < n " +
-            "console.write mas[i] i = i + 1 endwhile"
+    val converter = BlockToText()
+    workspaceBlocks.sortBy { it.position.y }
+    val code = converter.convertBlocksToCode(workspaceBlocks.map { it.block })
 
     fun output(text: String) {
         consoleOutput.add(text)
