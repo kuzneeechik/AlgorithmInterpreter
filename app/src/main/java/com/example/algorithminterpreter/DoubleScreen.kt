@@ -25,18 +25,15 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import kotlinx.coroutines.delay
-import java.util.UUID
-
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProjectScreen() {
-    var blockWithDeleteShownId by remember { mutableStateOf<UUID?>(null) }
     val consoleOutput = remember { mutableStateListOf<String>() }
     var blocksVisible by remember { mutableStateOf(false) }
     var consoleVisible by remember { mutableStateOf(false) }
@@ -59,19 +56,21 @@ fun ProjectScreen() {
         consoleOutput.add(text)
     }
 
-    fun startInterpreter() {
-        try {
-            val code = "int x x = 5 while x > 0 console.write x x = x - 1 endwhile"
-            val lexer = Lexer(code)
-            lexer.lexAnalysis()
-
-            val parser = Parser(lexer.tokens, ::output)
-            val rootNode = parser.parseCode()
-            parser.run(rootNode)
-        } catch (e: Exception) {
-            output("Error occurred: ${e.message}")
-        }
-    }
+//    fun startInterpreter() {
+//        try {
+//            val code = "int x x = 5 while x > 0 console.write x x = x - 1 endwhile"
+//
+//
+//            val lexer = Lexer(code)
+//            lexer.lexAnalysis()
+//
+//            val parser = Parser(lexer.tokens, ::output)
+//            val rootNode = parser.parseCode()
+//            parser.run(rootNode)
+//        } catch (e: Exception) {
+//            output("Error occurred: ${e.message}")
+//        }
+//    }
 
     fun addBlockInOrder(block: Block) {
         val baseX = 400f
@@ -79,31 +78,23 @@ fun ProjectScreen() {
         workspaceBlocks.add(PositionedBlock(block, Offset(baseX, 100f* arrayBlocks), ""))
 
     }
-
-
-    fun deleteBlock(id: UUID) {
-        workspaceBlocks.removeAll { it.block.id == id }
-        blockWithDeleteShownId = null
-    }
-
+    var scroll = rememberScrollState()
     Box(
         modifier = Modifier
-            .fillMaxSize()
+            .verticalScroll(scroll)
             .background(Color(0xFFE0DDFF))
-    )
-    {
+            .height(800.dp)
+    ) {
         FreeWorkspaceBlocksArea(
-
             blocks = workspaceBlocks,
             selectedBlock = null,
             onWorkspaceClick = {},
-            onBlockMove = { index, offset -> //обновляет позицию блока в списке при перетаскивании
+            onBlockMove = { index, offset ->
                 val old = workspaceBlocks[index]
                 workspaceBlocks[index] = old.copy(position = old.position + offset)
             },
-            menu = blocksVisible,
-            menuForBlockOfBlock = menuForBlockOfBlock,
-            changeMenuForBlockOfBlock = {menuForBlockOfBlock = !menuForBlockOfBlock }
+            changeMenuForBlockOfBlock = {menuForBlockOfBlock = !menuForBlockOfBlock},
+            menu = menuForBlockOfBlock
         )
 
         Image(
@@ -115,7 +106,9 @@ fun ProjectScreen() {
                 .width(35.dp)
                 .height(150.dp)
                 .clickable { if (!consoleVisible)
-                { blocksVisible = !blocksVisible } }
+                {
+                    blocksVisible = !blocksVisible
+                } }
         )
 
         Row(
@@ -245,7 +238,6 @@ fun ProjectScreen() {
                 addBlockInOrder(block)
                 if(blocksVisible) blocksVisible = false
                 if(menuForBlockOfBlock) menuForBlockOfBlock = false
-
             }
             Image(
                 painter = painterResource(id = R.drawable.block),

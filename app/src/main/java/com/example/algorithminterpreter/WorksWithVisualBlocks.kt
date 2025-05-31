@@ -32,6 +32,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Create
+import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -73,8 +74,7 @@ fun FreeWorkspaceBlocksArea(
     topBoundaryDp: Dp = 90.dp,
     bottomBoundaryDp: Dp = 190.dp,
     blockWidth: Dp = 270.dp,
-    menu : Boolean,
-    menuForBlockOfBlock: Boolean = false,
+    menu : Boolean = false,
     changeMenuForBlockOfBlock: ()-> Unit
 ) {
     var draggingIndex by remember { mutableStateOf<Int?>(null) }
@@ -636,7 +636,7 @@ fun BlockView(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center
                         ) {
-                            Icon(Icons.Outlined.Create, contentDescription = null)
+                            Icon(Icons.Outlined.Favorite, contentDescription = null)
                         }
                     }
                 }
@@ -646,80 +646,188 @@ fun BlockView(
         is IfElse -> {
             Box(
                 modifier = Modifier
-                    .background(shape = BlockIfElse(), color = Color(0xFFFFAD19))
+                    .background(shape = BlockIf(), color = Color(0xFFFFAD19))
                     .width(250.dp)
                     .height(95.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    Text(
-                        text = "else",
-                        color = Color.White,
-                        fontSize = 32.sp,
-                        fontWeight = FontWeight.Normal,
-                        textAlign = TextAlign.Start
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                }
-                Box(
+                Column(
                     modifier = Modifier
-                        .padding(
-                            horizontal = BaseVal.BlockHorizontalPadding,
-                            vertical = BaseVal.BlockVerticalPadding
-                        )
-                        .defaultMinSize(minHeight = 80.dp, minWidth = 252.dp)
-                        .height(block.inBlock.getHeightInDp(density))
-                        .width(block.inBlock.getWidthInDp(density))
-                        .background(
-                            color = Color.White.copy(alpha = 0.2f),
-                            shape = RoundedCornerShape(16.dp)
-                        )
-                        .border(
-                            width = 2.dp,
-                            color = Color.White.copy(alpha = 0.5f),
-                            shape = RoundedCornerShape(16.dp)
-                        )
+                        .wrapContentWidth()
+                        .wrapContentHeight()
+                        .padding(BaseVal.ColumnPadding),
+                    verticalArrangement = Arrangement.spacedBy(BaseVal.ColumnVerticalArrangement)
                 ) {
-                    block.inBlock.blocks.forEach { blockInner ->
-                        FreeWorkspaceBlocksArea(
-                            blocks = block.inBlock.blocks,
-                            selectedBlock = null,
-                            onWorkspaceClick = {},
-                            onBlockMove = { index, offset ->
-                                val old = block.inBlock.blocks[index]
-                                block.inBlock.blocks[index] = old.copy(position = old.position + offset)
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(BaseVal.ColumnHorizontalArrangement),
+                        verticalAlignment = Alignment.CenterVertically,
+
+                        ) {
+                        Text(
+                            text = "if",
+                            color = Color.White,
+                            fontSize = 26.sp,
+                            fontWeight = FontWeight.Medium,
+                            fontFamily = TomorrowFont,
+                            modifier = Modifier.width(BaseVal.standardIfLabelWidth)
+                        )
+                        OutlinedTextField(
+                            value = block.condition,
+                            onValueChange = {
+                                block.condition = it
                             },
-                            menu = menu,
-                            changeMenuForBlockOfBlock = {}
+                            modifier = Modifier
+                                .width(BaseVal.standardInputFieldWidth)
+                                .height(BaseVal.standardInputFieldHeight),
+                            enabled = !menu,
+                            singleLine = true,
                         )
                     }
-                    Spacer(modifier = Modifier.height(10.dp))
-                }
 
-                Button(
-                    onClick = {
-                        if (!menu) {
-                            onSwapMenu(block.inBlock)
+                    Box(
+                        modifier = Modifier
+                            .padding(
+                                horizontal = BaseVal.BlockHorizontalPadding,
+                                vertical = BaseVal.BlockVerticalPadding
+                            )
+                            .defaultMinSize(
+                                minHeight = BaseVal.BlockHeight,
+                                minWidth = BaseVal.BlockWidth
+                            )
+                            .height(block.ifBody.getHeightInDp(density))
+                            .width(block.ifBody.getWidthInDp(density))
+                            .background(
+                                color = Color.White.copy(alpha = BaseVal.bodyBlockTransparencyIndex),
+                                shape = RoundedCornerShape(BaseVal.roundCornerShape)
+                            )
+                            .border(
+                                width = BaseVal.borderWidth,
+                                color = Color.White.copy(alpha = BaseVal.borderTransparencyIndex),
+                                shape = RoundedCornerShape(BaseVal.roundCornerShape)
+                            )) {
+                        block.ifBody.blocks.forEach { blockInner ->
+                            key(blockInner.block.id) {
+                                FreeWorkspaceBlocksArea(
+                                    blocks = block.ifBody.blocks,
+                                    selectedBlock = null,
+                                    onWorkspaceClick = {},
+                                    onBlockMove = { index, offset ->
+                                        val old = block.ifBody.blocks[index]
+                                        block.ifBody.blocks[index] =
+                                            old.copy(position = old.position + offset)
+                                    },
+                                    menu = menu,
+                                    changeMenuForBlockOfBlock = {}
+                                )
+                            }
                         }
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF000000),
-                        contentColor = Color.White
-                    ),
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
+                        Spacer(modifier = Modifier.height(BaseVal.standardSpacerHeight))
+                    }
+
+                    Button(
+                        onClick = {
+                            if (!menu) {
+                                onSwapMenu(block.ifBody)
+                            }
+                        }, colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.Green,
+                            contentColor = Color.White
+                        ), modifier = Modifier.width(BaseVal.addBlockButtonWidth)
                     ) {
-                        Icon(Icons.Outlined.Add, contentDescription = null)
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Icon(Icons.Outlined.Favorite, contentDescription = null)
+                        }
+                    }
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentHeight(unbounded = true)
+                            .defaultMinSize(
+                                minHeight = BaseVal.BlockHeight,
+                                minWidth = BaseVal.BlockWidth
+                            ),
+                        verticalArrangement = Arrangement.spacedBy(BaseVal.ColumnVerticalArrangement)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = "else",
+                                color = Color.White,
+                                fontSize = 26.sp,
+                                fontWeight = FontWeight.Medium,
+                                fontFamily = TomorrowFont,
+                                modifier = Modifier.width(BaseVal.standardIfLabelWidth)
+                            )
+                        }
+                        Box(
+                            modifier = Modifier
+                                .padding(
+                                    horizontal = BaseVal.BlockHorizontalPadding,
+                                    vertical = BaseVal.BlockVerticalPadding
+                                )
+                                .defaultMinSize(
+                                    minHeight = BaseVal.BlockHeight,
+                                    minWidth = BaseVal.BlockWidth
+                                )
+                                .height(block.elseBlock.getHeightInDp(density))
+                                .width(block.elseBlock.getWidthInDp(density))
+                                .background(
+                                    color = Color.White.copy(alpha = BaseVal.bodyBlockTransparencyIndex),
+                                    shape = RoundedCornerShape(BaseVal.roundCornerShape)
+                                )
+                                .border(
+                                    width = BaseVal.borderWidth,
+                                    color = Color.White.copy(alpha = BaseVal.borderTransparencyIndex),
+                                    shape = RoundedCornerShape(BaseVal.roundCornerShape)
+                                )) {
+                            block.elseBlock.blocks.forEach { blockFor ->
+                                key(blockFor.block.id) {
+                                    FreeWorkspaceBlocksArea(
+                                        blocks = block.elseBlock.blocks,
+                                        selectedBlock = null,
+                                        onWorkspaceClick = {},
+                                        onBlockMove = { index, offset ->
+                                            val old = block.elseBlock.blocks[index]
+                                            block.elseBlock.blocks[index] =
+                                                old.copy(position = old.position + offset)
+                                        },
+                                        menu = menu,
+                                        changeMenuForBlockOfBlock = {}
+                                    )
+                                }
+                            }
+                            Spacer(modifier = Modifier.height(BaseVal.standardSpacerHeight))
+                        }
+                        Button(
+                            onClick = {
+                                if (!menu) {
+                                    onSwapMenu(block.elseBlock)
+                                }
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color.Yellow,
+                                contentColor = Color.White
+                            ),
+                            modifier = Modifier.width(BaseVal.addBlockButtonWidth)
+                        ) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Icon(Icons.Outlined.Favorite, contentDescription = null)
+                            }
+                        }
                     }
                 }
             }
         }
-
         is While -> {
             Box(
                 modifier = Modifier
@@ -779,23 +887,6 @@ fun BlockView(
                             fontFamily = TomorrowFont,
                             modifier = Modifier.width(4.dp)
                         )
-
-                        Button(
-                            onClick = {
-                                if (!menu) {
-                                    onSwapMenu(block.inBlocks)
-                                }
-                            }, colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFF7943DE), contentColor = Color.White
-                            ), modifier = Modifier.width(BaseVal.addBlockButtonWidth)
-                        ) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center
-                            ) {
-                                Icon(Icons.Outlined.Add, contentDescription = null)
-                            }
-                        }
                     }
 
                     Box(
@@ -810,7 +901,6 @@ fun BlockView(
                             )
                             .height(block.inBlocks.getHeightInDp(density))
                             .width(block.inBlocks.getWidthInDp(density))
-                            .clickable { innerBlockWithDeleteShownId = null }
                             .background(
                                 color = Color.White.copy(alpha = BaseVal.bodyBlockTransparencyIndex),
                                 shape = RoundedCornerShape(BaseVal.roundCornerShape)
@@ -837,6 +927,23 @@ fun BlockView(
 
                         }
                         Spacer(modifier = Modifier.height(BaseVal.standardSpacerHeight))
+                    }
+
+                    Button(
+                        onClick = {
+                            if (!menu) {
+                                onSwapMenu(block.inBlocks)
+                            }
+                        }, colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF7943DE), contentColor = Color.White
+                        ), modifier = Modifier.width(BaseVal.addBlockButtonWidth)
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Icon(Icons.Outlined.Favorite, contentDescription = null)
+                        }
                     }
                 }
             }

@@ -37,11 +37,15 @@ object BaseVal {
     val standardAddElseBlockButtonWidth = 104.dp
     val standardIfLabelWidth = 60.dp
     val addBlockButtonWidth = 60.dp
-    val rowWidth = standardIfLabelWidth + standardInputFieldWidth + addBlockButtonWidth
+    val rowWidth = 60.dp + 220.dp + 60.dp
     val borderWidth = 2.dp
     val roundCornerShape = 16.dp
     val bodyBlockTransparencyIndex = 0.2f
     val borderTransparencyIndex = 0.5f
+    object IfElseBlock {
+        val rowWidth = 60.dp + 220.dp + 60.dp
+        val overallPadding = 8.dp * 2 + 16.dp * 2
+    }
     object WhileBlock {
         val horizontalArrangement = 8.dp
 
@@ -52,8 +56,8 @@ object BaseVal {
 
         val rowPadding = 16.dp
 
-        val rowWidth = labelWidth + inputTextFieldWidth + 4.dp * 2 + horizontalArrangement * 6 + addBlockButtonWidth
-        val overallPadding = 8.dp * 2 + standardBoxPadding * 2
+        val rowWidth = labelWidth + inputTextFieldWidth + 4.dp * 2 + horizontalArrangement * 6 + 60.dp
+        val overallPadding = 8.dp * 2 + 16.dp * 2
     }
 }
 
@@ -168,7 +172,7 @@ class BlocOfBlock(
     }
 
     override fun getHeightInPx(density: Density): Float {
-        return getLowestPoint(density) + with(density) {(BaseVal.BlockVerticalPadding * 2).toPx()}
+        return getLowestPoint(density) + with(density) {(12.dp * 2).toPx()}
     }
 
     override fun getWidthInPx(density: Density): Float{
@@ -177,7 +181,7 @@ class BlocOfBlock(
             if (width < block.block.getWidthInPx(density))
                 width = block.block.getWidthInPx(density)
         }
-        return width + with(density) {(BaseVal.BlockHorizontalPadding * 2).toPx()}
+        return width + with(density) {(8.dp * 2).toPx()}
     }
     fun copy(): Block {
         return BlocOfBlock(UUID.randomUUID())
@@ -194,14 +198,14 @@ class If(
     var blocksInIf = BlocOfBlock(blockId = UUID.randomUUID())
 
     var standardHeight =
-        (BaseVal.standardBoxPadding * 2 + BaseVal.standardInputFieldHeight + BaseVal.standardSpacerHeight + BaseVal.ColumnHorizontalArrangement * 3 + BaseVal.standardAddElseBlockButtonHeight + BaseVal.ColumnPadding * 2)
+        (16.dp * 2 + 56.dp + 10.dp + 8.dp * 3 + 48.dp + 8.dp * 2)
 
     override fun getHeightInPx(density: Density): Float {
         var inBox = 0f
-        inBox += with(density) {(BaseVal.ColumnPadding * 2).toPx()}
+        inBox += with(density) {(8.dp * 2).toPx()}
         for (blockIn in blocksInIf.blocks) {
             inBox += blockIn.block.getHeightInPx(density)
-            inBox += with(density) {(BaseVal.ColumnHorizontalArrangement).toPx()}
+            inBox += with(density) {(8.dp).toPx()}
         }
         return inBox
     }
@@ -223,11 +227,44 @@ class If(
 }
 
 class IfElse(id: UUID) : Block(id, Color(0xFFFFAD19), heightInDP = 95.dp, widthInDp = 250.dp) {
-    var condition: List<Block> = emptyList()
-    var ifBody: List<Block> = emptyList()
-    var elseBody: List<Block> = emptyList()
+    var condition: String = ""
+    var ifBody = BlocOfBlock(UUID.randomUUID())
+    var elseBody: String = ""
+    var elseBlock = BlocOfBlock(UUID.randomUUID())
+    
+    var standardHeight =
+        (56.dp + 10.dp + 8.dp * 2 + 8.dp * 2)
 
-    var inBlock = BlocOfBlock(UUID.randomUUID())
+    var standardWidth = BaseVal.IfElseBlock.rowWidth
+
+    var standardBottomRowHeight = (8.dp * 2 + 48.dp)
+
+
+    override fun getHeightInPx(density: Density): Float {
+        var inBox = 0f
+
+        for (block in ifBody.blocks) {
+            inBox += block.block.getHeightInPx(density)
+            inBox += with(density) { (standardHeight).toPx() }
+        }
+        inBox += elseBlock.getHeightInPx(density)
+        inBox += with(density) { (standardHeight).toPx() }
+        inBox = max(inBox, super.getHeightInPx(density))
+        return inBox
+    }
+
+    override fun getWidthInPx(density: Density): Float {
+        var inBox = with(density) { (standardWidth).toPx() }
+        inBox = max(inBox, elseBlock.getHeightInPx(density))
+        for (block in ifBody.blocks) {
+            inBox = max(inBox, block.block.getWidthInPx(density))
+        }
+        inBox += with(density) { (BaseVal.IfElseBlock.overallPadding).toPx() }
+        inBox = max(inBox, super.getWidthInPx(density))
+        return inBox
+    }
+
+    
 }
 
 class While(id: UUID) : Block(id, Color(0xFFFF5755), heightInDP = 350.dp, widthInDp = 255.dp) {
