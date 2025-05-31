@@ -218,7 +218,6 @@ fun ProjectScreen() {
                     .clickable { consoleVisible = !consoleVisible }
             )
         }
-
         if (blocksVisible || menuForBlockOfBlock) {
             Box(
                 modifier = Modifier
