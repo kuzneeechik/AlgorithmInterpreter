@@ -121,10 +121,29 @@ fun ProjectScreen() {
         }
     }
 
+
+
+    var cursorVisible by remember { mutableStateOf(true) }
+    val cursorAlpha by animateFloatAsState(
+        targetValue = if (cursorVisible) { 1f }
+        else {0f}, //(видим/невидим)
+        animationSpec = infiniteRepeatable(
+            animation = tween(500),
+            repeatMode = RepeatMode.Reverse //это то что повтор
+        )
+    )
+// это запуск мигания
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(500)
+            cursorVisible = !cursorVisible
+        }
+    }
+
     fun addBlockInOrder(block: Block) {
         val baseX = 400f
         val arrayBlocks = workspaceBlocks.size+ 1
-        workspaceBlocks.add(PositionedBlock(block, Offset(baseX, 100f* arrayBlocks), ""))
+        workspaceBlocks.add(PositionedBlock(block, Offset(baseX, 400f), ""))
 
     }
     var scroll = rememberScrollState()
@@ -306,22 +325,7 @@ fun ProjectScreen() {
             )
         }
 
-        var cursorVisible by remember { mutableStateOf(true) }
-        val cursorAlpha by animateFloatAsState(
-            targetValue = if (cursorVisible) { 1f }
-            else {0f}, //(видим/невидим)
-            animationSpec = infiniteRepeatable(
-                animation = tween(500),
-                repeatMode = RepeatMode.Reverse //это то что повтор
-            )
-        )
-// это запуск мигания
-        LaunchedEffect(Unit) {
-            while (true) {
-                delay(500)
-                cursorVisible = !cursorVisible
-            }
-        }
+
         if (consoleVisible) {
             Box(
                 modifier = Modifier
