@@ -15,7 +15,7 @@ class BlockToText {
                 val body = block.body.blocks
                     .joinToString(" ") { convertBlockToText(it.block) }
 
-                return "if $condition {$body} "
+                return "if $condition {$body} endif "
             }
 
             is IfElse -> {
@@ -27,7 +27,7 @@ class BlockToText {
                 val elseBody = block.elseBody.blocks
                     .joinToString(" ") { convertBlockToText(it.block) }
 
-                return "if $condition {$ifBody} else {$elseBody} "
+                return "if $condition {$ifBody} else {$elseBody} endif "
             }
 
             is While -> {
@@ -36,14 +36,14 @@ class BlockToText {
                 val body = block.WhileBody.blocks
                     .joinToString(" ") { convertBlockToText(it.block) }
 
-                return "while $condition {$body} "
+                return "while $condition {$body} endwhile "
             }
 
             is ConsoleRead -> return "console.read ${block.elem} "
 
             is ConsoleWrite -> return "console.write ${block.elem} "
 
-            else -> throw IllegalArgumentException("Unknown block type: ${block.javaClass.simpleName}")
+            else -> throw Exception("Unknown block type")
         }
     }
 

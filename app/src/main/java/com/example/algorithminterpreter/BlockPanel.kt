@@ -195,7 +195,7 @@ class While(id: UUID) :
 
     override fun getWidthInPx(density: Density): Float {
         var res = max(with(density) { (standardWidth).toPx() }, WhileBody.getWidthInPx(density))
-        res += with(density) { (BaseVal.WhileBlock.overallPadding).toPx() }
+        res += with(density) { 48.dp.toPx() }
         res = max(res, super.getWidthInPx(density))
         return res
     }
