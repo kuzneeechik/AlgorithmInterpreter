@@ -558,12 +558,12 @@ fun BlockView(
                     modifier = Modifier
                         .wrapContentWidth()
                         .wrapContentHeight()
-                        .padding(BaseVal.ColumnPadding),
+                        .padding(8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(BaseVal.ColumnHorizontalArrangement),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
@@ -589,8 +589,8 @@ fun BlockView(
                     Box(
                         modifier = Modifier
                             .padding(
-                                horizontal = BaseVal.BlockHorizontalPadding,
-                                vertical = BaseVal.BlockVerticalPadding
+                                horizontal = 8.dp,
+                                vertical = 12.dp
                             )
                             .defaultMinSize(minHeight = 80.dp, minWidth = 252.dp)
                             .height(block.blocksInIf.getHeightInDp(density))
@@ -655,11 +655,11 @@ fun BlockView(
                     modifier = Modifier
                         .wrapContentWidth()
                         .wrapContentHeight()
-                        .padding(BaseVal.ColumnPadding),
-                    verticalArrangement = Arrangement.spacedBy(BaseVal.ColumnVerticalArrangement)
+                        .padding(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(BaseVal.ColumnHorizontalArrangement),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically,
 
                         ) {
@@ -669,7 +669,7 @@ fun BlockView(
                             fontSize = 26.sp,
                             fontWeight = FontWeight.Medium,
                             fontFamily = TomorrowFont,
-                            modifier = Modifier.width(BaseVal.standardIfLabelWidth)
+                            modifier = Modifier.width(60.dp)
                         )
                         OutlinedTextField(
                             value = block.condition,
@@ -677,8 +677,8 @@ fun BlockView(
                                 block.condition = it
                             },
                             modifier = Modifier
-                                .width(BaseVal.standardInputFieldWidth)
-                                .height(BaseVal.standardInputFieldHeight),
+                                .width(220.dp)
+                                .height(56.dp),
                             enabled = !menu,
                             singleLine = true,
                         )
@@ -687,23 +687,23 @@ fun BlockView(
                     Box(
                         modifier = Modifier
                             .padding(
-                                horizontal = BaseVal.BlockHorizontalPadding,
-                                vertical = BaseVal.BlockVerticalPadding
+                                horizontal = 8.dp,
+                                vertical = 12.dp
                             )
                             .defaultMinSize(
-                                minHeight = BaseVal.BlockHeight,
-                                minWidth = BaseVal.BlockWidth
+                                minHeight = 80.dp,
+                                minWidth = 256.dp
                             )
                             .height(block.ifBody.getHeightInDp(density))
                             .width(block.ifBody.getWidthInDp(density))
                             .background(
-                                color = Color.White.copy(alpha = BaseVal.bodyBlockTransparencyIndex),
-                                shape = RoundedCornerShape(BaseVal.roundCornerShape)
+                                color = Color.White.copy(alpha =  0.2f),
+                                shape = RoundedCornerShape( 16.dp)
                             )
                             .border(
-                                width = BaseVal.borderWidth,
-                                color = Color.White.copy(alpha = BaseVal.borderTransparencyIndex),
-                                shape = RoundedCornerShape(BaseVal.roundCornerShape)
+                                width = 2.dp,
+                                color = Color.White.copy(alpha = 0.5f),
+                                shape = RoundedCornerShape( 16.dp)
                             )) {
                         block.ifBody.blocks.forEach { blockInner ->
                             key(blockInner.block.id) {
@@ -721,7 +721,7 @@ fun BlockView(
                                 )
                             }
                         }
-                        Spacer(modifier = Modifier.height(BaseVal.standardSpacerHeight))
+                        Spacer(modifier = Modifier.height(10.dp))
                     }
 
                     Button(
@@ -732,7 +732,7 @@ fun BlockView(
                         }, colors = ButtonDefaults.buttonColors(
                             containerColor = Color.Green,
                             contentColor = Color.White
-                        ), modifier = Modifier.width(BaseVal.addBlockButtonWidth)
+                        ), modifier = Modifier.width(60.dp)
                     ) {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
@@ -747,10 +747,10 @@ fun BlockView(
                             .fillMaxWidth()
                             .wrapContentHeight(unbounded = true)
                             .defaultMinSize(
-                                minHeight = BaseVal.BlockHeight,
-                                minWidth = BaseVal.BlockWidth
+                                minHeight = 80.dp,
+                                minWidth = 256.dp
                             ),
-                        verticalArrangement = Arrangement.spacedBy(BaseVal.ColumnVerticalArrangement)
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -763,29 +763,29 @@ fun BlockView(
                                 fontSize = 26.sp,
                                 fontWeight = FontWeight.Medium,
                                 fontFamily = TomorrowFont,
-                                modifier = Modifier.width(BaseVal.standardIfLabelWidth)
+                                modifier = Modifier.width(60.dp)
                             )
                         }
                         Box(
                             modifier = Modifier
                                 .padding(
-                                    horizontal = BaseVal.BlockHorizontalPadding,
-                                    vertical = BaseVal.BlockVerticalPadding
+                                    horizontal = 8.dp,
+                                    vertical = 12.dp
                                 )
                                 .defaultMinSize(
-                                    minHeight = BaseVal.BlockHeight,
-                                    minWidth = BaseVal.BlockWidth
+                                    minHeight = 80.dp,
+                                    minWidth = 256.dp
                                 )
                                 .height(block.elseBlock.getHeightInDp(density))
                                 .width(block.elseBlock.getWidthInDp(density))
                                 .background(
-                                    color = Color.White.copy(alpha = BaseVal.bodyBlockTransparencyIndex),
-                                    shape = RoundedCornerShape(BaseVal.roundCornerShape)
+                                    color = Color.White.copy(alpha =  0.2f),
+                                    shape = RoundedCornerShape( 16.dp)
                                 )
                                 .border(
-                                    width = BaseVal.borderWidth,
-                                    color = Color.White.copy(alpha = BaseVal.borderTransparencyIndex),
-                                    shape = RoundedCornerShape(BaseVal.roundCornerShape)
+                                    width = 2.dp,
+                                    color = Color.White.copy(alpha = 0.5f),
+                                    shape = RoundedCornerShape( 16.dp)
                                 )) {
                             block.elseBlock.blocks.forEach { blockFor ->
                                 key(blockFor.block.id) {
@@ -803,7 +803,7 @@ fun BlockView(
                                     )
                                 }
                             }
-                            Spacer(modifier = Modifier.height(BaseVal.standardSpacerHeight))
+                            Spacer(modifier = Modifier.height(10.dp))
                         }
                         Button(
                             onClick = {
@@ -815,7 +815,7 @@ fun BlockView(
                                 containerColor = Color.Yellow,
                                 contentColor = Color.White
                             ),
-                            modifier = Modifier.width(BaseVal.addBlockButtonWidth)
+                            modifier = Modifier.width(60.dp)
                         ) {
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -839,12 +839,12 @@ fun BlockView(
                 Column(
                     modifier = Modifier
                         .wrapContentWidth()
-                        .padding(BaseVal.ColumnPadding),
-                    verticalArrangement = Arrangement.spacedBy(BaseVal.ColumnVerticalArrangement)
+                        .padding(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Row(
                         modifier = Modifier.wrapContentWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(BaseVal.WhileBlock.horizontalArrangement),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
@@ -853,7 +853,7 @@ fun BlockView(
                             fontSize = 26.sp,
                             fontWeight = FontWeight.Medium,
                             fontFamily = TomorrowFont,
-                            modifier = Modifier.width(BaseVal.WhileBlock.labelWidth)
+                            modifier = Modifier.width(70.dp)
                         )
 
                         Text(
@@ -869,8 +869,8 @@ fun BlockView(
                             value = block.condition,
                             onValueChange = { block.condition = it },
                             modifier = Modifier
-                                .width(BaseVal.WhileBlock.inputTextFieldWidth)
-                                .height(BaseVal.WhileBlock.inputTextFieldHeight),
+                                .width(146.dp)
+                                .height(56.dp),
                             enabled = !menu,
                             singleLine = true,
                             textStyle = TextStyle(
@@ -892,23 +892,23 @@ fun BlockView(
                     Box(
                         modifier = Modifier
                             .padding(
-                                horizontal = BaseVal.BlockHorizontalPadding,
-                                vertical = BaseVal.BlockVerticalPadding
+                                horizontal = 8.dp,
+                                vertical = 12.dp
                             )
                             .defaultMinSize(
-                                minHeight = BaseVal.BlockHeight,
-                                minWidth = BaseVal.BlockWidth
+                                minHeight = 80.dp,
+                                minWidth = 256.dp
                             )
                             .height(block.inBlocks.getHeightInDp(density))
                             .width(block.inBlocks.getWidthInDp(density))
                             .background(
-                                color = Color.White.copy(alpha = BaseVal.bodyBlockTransparencyIndex),
-                                shape = RoundedCornerShape(BaseVal.roundCornerShape)
+                                color = Color.White.copy(alpha =  0.2f),
+                                shape = RoundedCornerShape( 16.dp)
                             )
                             .border(
-                                width = BaseVal.borderWidth,
-                                color = Color.White.copy(alpha = BaseVal.borderTransparencyIndex),
-                                shape = RoundedCornerShape(BaseVal.roundCornerShape)
+                                width = 2.dp,
+                                color = Color.White.copy(alpha = 0.5f),
+                                shape = RoundedCornerShape( 16.dp)
                             )) {
                         block.inBlocks.blocks.forEach { blockInner ->
                             key(blockInner.block.id) {
@@ -926,7 +926,7 @@ fun BlockView(
                             }
 
                         }
-                        Spacer(modifier = Modifier.height(BaseVal.standardSpacerHeight))
+                        Spacer(modifier = Modifier.height(10.dp))
                     }
 
                     Button(
@@ -936,7 +936,7 @@ fun BlockView(
                             }
                         }, colors = ButtonDefaults.buttonColors(
                             containerColor = Color(0xFF7943DE), contentColor = Color.White
-                        ), modifier = Modifier.width(BaseVal.addBlockButtonWidth)
+                        ), modifier = Modifier.width(60.dp)
                     ) {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
