@@ -12,7 +12,6 @@ class Parser(private val tokens: List<Token>, private val output: (String) -> Un
             pos++
         }
     }
-
     private fun match(vararg expected: TokenType): Token? {
         if (pos < tokens.size) {
             val currentToken = tokens[pos]
